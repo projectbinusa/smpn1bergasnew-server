@@ -25,7 +25,7 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.Binusa.BawasluServer.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.smpn1.bergas.controller"))
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo())
