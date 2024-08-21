@@ -3,6 +3,7 @@ package com.smpn1.bergas.controller;
 
 
 import com.smpn1.bergas.model.Kontak;
+import com.smpn1.bergas.model.Kontak;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.KontakService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,30 @@ public class KontakController {
         CommonResponse<Page<Kontak>> response = new CommonResponse<>();
         try {
             Page<Kontak> beritaPage = kontakService.getAll(pageable);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage(" Kontak list retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve guru list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping(path = "/all/terbaru")
+    public ResponseEntity<CommonResponse<Page<Kontak>>> listAllKontakTerbaru(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        CommonResponse<Page<Kontak>> response = new CommonResponse<>();
+        try {
+            Page<Kontak> beritaPage = kontakService.getAllTerbaru(pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);

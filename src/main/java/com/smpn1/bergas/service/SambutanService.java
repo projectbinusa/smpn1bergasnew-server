@@ -1,5 +1,6 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Sambutan;
 import com.smpn1.bergas.repository.SambutanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class SambutanService {
     }
     public Page<Sambutan> getAll(Pageable pageable){
         return sambutanRepository.findAll(pageable);
+    }
+    public Page<Sambutan> getAllTerbaru(Pageable pageable) {
+        return sambutanRepository.getAll(pageable);
     }
     public Sambutan edit(Sambutan sambutan , Long id){
         Sambutan update = sambutanRepository.findById(id).orElse(null);

@@ -1,5 +1,6 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Kontak;
 import com.smpn1.bergas.repository.KontakRespository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class KontakService {
     }
     public Page<Kontak> getAll(Pageable pageable){
         return kontakRespository.findAll(pageable);
+    }
+    public Page<Kontak> getAllTerbaru(Pageable pageable) {
+        return kontakRespository.getAll(pageable);
     }
     public Kontak edit(Kontak kontak , Long id){
         Kontak update = kontakRespository.findById(id).orElse(null);

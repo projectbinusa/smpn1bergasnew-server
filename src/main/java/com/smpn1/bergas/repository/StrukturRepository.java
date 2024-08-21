@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface StrukturRepository extends JpaRepository<Struktur , Long> {
-    @Query(value = "SELECT * FROM struktur WHERE jenis = :id " , nativeQuery = true)
+    @Query(value = "SELECT * FROM struktur WHERE jenis = :id AND ORDER BY update_date DESC" , nativeQuery = true)
     Page<Struktur> findByJenisId(String id , Pageable pageable);
+    @Query(value = "SELECT * FROM struktur ORDER BY update_date DESC" ,nativeQuery = true)
+    Page<Struktur> getAll(Pageable pageable);
 
-    @Query(value = "SELECT * FROM struktur  WHERE jenis = :id ", nativeQuery = true)
-    List<Struktur> getAllByJenis(String id);
 }

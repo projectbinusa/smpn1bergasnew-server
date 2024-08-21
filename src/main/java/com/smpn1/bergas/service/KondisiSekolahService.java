@@ -6,6 +6,7 @@ import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.KondisiSekolah;
 import com.smpn1.bergas.repository.KondisiSekolahRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ public class KondisiSekolahService {
     }
     public Page<KondisiSekolah> getAll(Pageable pageable){
         return kondisiSekolahRepository.findAll(pageable);
+    }
+    public Page<KondisiSekolah> getAllTerbaru(Pageable pageable) {
+        return kondisiSekolahRepository.getAll(pageable);
     }
     public Map<String, Boolean> delete(Long id) {
         try {

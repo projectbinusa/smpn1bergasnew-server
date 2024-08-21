@@ -1,5 +1,6 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Sarana;
 import com.smpn1.bergas.repository.SaranaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class SaranaService {
     }
     public Page<Sarana> getAll(Pageable pageable){
         return saranaRepository.findAll(pageable);
+    }
+    public Page<Sarana> getAllTerbaru(Pageable pageable) {
+        return saranaRepository.getAll(pageable);
     }
     public Sarana edit(Sarana sarana ,Long id){
         Sarana update = saranaRepository.findById(id).orElse(null);

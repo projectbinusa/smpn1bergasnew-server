@@ -107,9 +107,7 @@ public class BeritaService {
     }
 
 
-    public List<Berita> getByTags(Long tagsId) {
-        return beritaDao.getAllByTags(tagsId);
-    }
+
 
     public Page<Berita> getByCategory(String categoryId, Pageable pageable) {
         return beritaDao.findByCategoryBerita_Id(categoryId, pageable);

@@ -1,6 +1,7 @@
 package com.smpn1.bergas.service;
 
 import com.smpn1.bergas.DTO.FotoKegiatanDTO;
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.FotoKegiatan;
 import com.smpn1.bergas.repository.FotoKegiatanRepository;
 import com.smpn1.bergas.repository.KegiatanRepository;
@@ -48,6 +49,9 @@ public class FotoKegiatanService {
     }
     public Page<FotoKegiatan> getAll(Pageable pageable){
         return fotoKegiatanRepository.findAll(pageable);
+    }
+    public Page<FotoKegiatan> getAllTerbaru(Pageable pageable) {
+        return fotoKegiatanRepository.getAll(pageable);
     }
     public Page<FotoKegiatan> getAllByKegiatan(Long id ,Pageable pageable){
         return fotoKegiatanRepository.findByKegiatanId(id,pageable);

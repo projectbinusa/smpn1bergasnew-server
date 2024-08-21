@@ -44,6 +44,9 @@ public class AlumniService {
     public Page<Alumni> getAll(Pageable pageable) {
         return alumniRepository.findAll(pageable);
     }
+    public Page<Alumni> getAllTerbaru(Pageable pageable) {
+        return alumniRepository.getAll(pageable);
+    }
 
     public Alumni edit(Alumni alumni, MultipartFile multipartFile, Long id) throws Exception {
         Alumni update = alumniRepository.findById(id).orElse(null);

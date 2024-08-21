@@ -1,6 +1,7 @@
 package com.smpn1.bergas.service;
 
 import com.smpn1.bergas.DTO.KeuanganDTO;
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Keuangan;
 import com.smpn1.bergas.repository.KeuanganRepository;
 import com.google.auth.Credentials;
@@ -52,6 +53,9 @@ public class KeuanganService {
 
     public Page<Keuangan> getAll(Pageable pageable) {
         return keuanganRepository.findAll(pageable);
+    }
+    public Page<Keuangan> getAllTerbaru(Pageable pageable) {
+        return keuanganRepository.getAll(pageable);
     }
 
     public Map<String, Boolean> delete(Long id) {
