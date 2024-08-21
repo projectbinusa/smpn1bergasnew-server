@@ -30,7 +30,7 @@ public class PrestasiService {
     @Autowired
     PrestasiRepository prestasiRepository;
 
-    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/bawaslu-a6bd2.appspot.com/o/%s?alt=media";
+    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-a0910.appspot.com/o/%s?alt=media";
 
 
     public Prestasi add(Prestasi prestasi , MultipartFile multipartFile) throws Exception {
@@ -103,7 +103,7 @@ public class PrestasiService {
     }
 
     private String uploadFile(File file, String fileName) throws IOException {
-        BlobId blobId = BlobId.of("bawaslu-a6bd2.appspot.com", fileName);
+        BlobId blobId = BlobId.of("upload-image-example-a0910.appspot.com", fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
         InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
         Credentials credentials = GoogleCredentials.fromStream(serviceAccount);

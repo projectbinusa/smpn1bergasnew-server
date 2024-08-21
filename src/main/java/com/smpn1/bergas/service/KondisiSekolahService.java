@@ -1,13 +1,13 @@
 package com.smpn1.bergas.service;
 
-import com.smpn1.bergas.model.Ekstrakurikuler;
-import com.smpn1.bergas.repository.EkstrakurikulerRepository;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.smpn1.bergas.model.KondisiSekolah;
+import com.smpn1.bergas.repository.KondisiSekolahRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,40 +26,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-public class EkstrakurikulerService {
+public class KondisiSekolahService {
     @Autowired
-    private EkstrakurikulerRepository ekstrakurikulerRepository;
+    private KondisiSekolahRepository kondisiSekolahRepository;
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-a0910.appspot.com/o/%s?alt=media";
 
 
-    public Ekstrakurikuler add(Ekstrakurikuler ekstrakurikuler , MultipartFile multipartFile) throws Exception {
-        String image = imageConverter(multipartFile);
-        ekstrakurikuler.setFoto(image);
-        return ekstrakurikulerRepository.save(ekstrakurikuler);
+    public KondisiSekolah add(KondisiSekolah kondisiSekolah , MultipartFile multipartFile) throws Exception {
+        String foto = imageConverter(multipartFile);
+        kondisiSekolah.setFoto(foto);
+        return kondisiSekolahRepository.save(kondisiSekolah);
     }
-    public Ekstrakurikuler getById(Long id){
-        return ekstrakurikulerRepository.findById(id).orElse(null);
+    public KondisiSekolah edit(KondisiSekolah kondisiSekolah , MultipartFile multipartFile , Long id) throws Exception {
+        KondisiSekolah update = kondisiSekolahRepository.findById(id).orElse(null);
+        String foto = imageConverter(multipartFile);
+        update.setFoto(foto);
+        update.setDeskripsi(kondisiSekolah.getDeskripsi());
+        return kondisiSekolahRepository.save(kondisiSekolah);
     }
-    public Page<Ekstrakurikuler> getAll(Pageable pageable){
-        return ekstrakurikulerRepository.findAll(pageable);
+    public KondisiSekolah getByid(Long id){
+        return kondisiSekolahRepository.findById(id).orElse(null);
     }
-    public Ekstrakurikuler edit(Ekstrakurikuler ekstrakurikuler , Long id , MultipartFile multipartFile) throws Exception {
-        String image = imageConverter(multipartFile);
-        Ekstrakurikuler update = ekstrakurikulerRepository.findById(id).orElse(null);
-        update.setName(ekstrakurikuler.getName());
-        update.setDeskripsi(ekstrakurikuler.getDeskripsi());
-        update.setJadwal(ekstrakurikuler.getJadwal());
-        update.setKoordinator(ekstrakurikuler.getKoordinator());
-        update.setPembimbing(ekstrakurikuler.getPembimbing());
-        update.setTempat(ekstrakurikuler.getTempat());
-        update.setPrestasi(ekstrakurikuler.getPrestasi());
-        update.setFoto(image);
-        return ekstrakurikulerRepository.save(update);
+    public Page<KondisiSekolah> getAll(Pageable pageable){
+        return kondisiSekolahRepository.findAll(pageable);
     }
     public Map<String, Boolean> delete(Long id) {
         try {
-            ekstrakurikulerRepository.deleteById(id);
+            kondisiSekolahRepository.deleteById(id);
             Map<String, Boolean> response = new HashMap<>();
             response.put("Deleted", Boolean.TRUE);
             return response;
@@ -67,6 +61,11 @@ public class EkstrakurikulerService {
             return Collections.singletonMap("Deleted", Boolean.FALSE);
         }
     }
+
+
+
+
+
     private String imageConverter(MultipartFile multipartFile) throws Exception {
         try {
             String fileName = getExtension(multipartFile.getOriginalFilename());
