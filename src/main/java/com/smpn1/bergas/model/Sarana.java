@@ -17,6 +17,9 @@ public class Sarana extends DateConfig {
     @Column(name = "deskripsi")
     private String deskripsi;
 
+    @Column(name = "category")
+    private String category;
+
     public Long getId() {
         return id;
     }
@@ -39,5 +42,13 @@ public class Sarana extends DateConfig {
 
     public void setDeskripsi(String deskripsi) {
         this.deskripsi = deskripsi;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }
