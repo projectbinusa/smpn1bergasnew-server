@@ -33,6 +33,7 @@ public class SaranaService {
         Sarana update = saranaRepository.findById(id).orElse(null);
         update.setNama_sarana(sarana.getNama_sarana());
         update.setDeskripsi(sarana.getDeskripsi());
+        update.setCategory(sarana.getCategory());
         return saranaRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {
