@@ -27,30 +27,36 @@ import java.util.Map;
 
 @Service
 public class AlumniService {
-    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/bawaslu-a6bd2.appspot.com/o/%s?alt=media";
+    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-a0910.appspot.com/o/%s?alt=media";
     @Autowired
     AlumniRepository alumniRepository;
 
-    public Alumni add(Alumni alumni , MultipartFile multipartFile) throws Exception {
+    public Alumni add(Alumni alumni, MultipartFile multipartFile) throws Exception {
         String image = imageConverter(multipartFile);
         alumni.setFoto(image);
         return alumniRepository.save(alumni);
     }
-    public Alumni getById(Long id){
+
+    public Alumni getById(Long id) {
         return alumniRepository.findById(id).orElse(null);
     }
-    public Page<Alumni> getAll(Pageable pageable){
+
+    public Page<Alumni> getAll(Pageable pageable) {
         return alumniRepository.findAll(pageable);
     }
-    public Alumni edit(Alumni alumni , MultipartFile multipartFile , Long id) throws Exception {
-    Alumni update = alumniRepository.findById(id).orElse(null);
-    String image = imageConverter(multipartFile);
-    update.setBiografi(alumni.getBiografi());
-    update.setNama(alumni.getNama());
-    update.setFoto(image);
-    return alumniRepository.save(update);
 
+    public Alumni edit(Alumni alumni, MultipartFile multipartFile, Long id) throws Exception {
+        Alumni update = alumniRepository.findById(id).orElse(null);
+        if (update != null) {
+            String image = imageConverter(multipartFile);
+            update.setBiografi(alumni.getBiografi());
+            update.setNama(alumni.getNama());
+            update.setFoto(image);
+            return alumniRepository.save(update);
+        }
+        return null;
     }
+
     public Map<String, Boolean> delete(Long id) {
         try {
             alumniRepository.deleteById(id);
@@ -62,41 +68,45 @@ public class AlumniService {
         }
     }
 
-
     private String imageConverter(MultipartFile multipartFile) throws Exception {
         try {
-            String fileName = getExtension(multipartFile.getOriginalFilename());
+            String fileName = getFileNameWithExtension(multipartFile.getOriginalFilename());
             File file = convertFile(multipartFile, fileName);
-            var RESPONSE_URL = uploadFile(file, fileName);
+            String responseUrl = uploadFile(file, fileName);
             file.delete();
-            return RESPONSE_URL;
+            return responseUrl;
         } catch (Exception e) {
-            e.getStackTrace();
+            e.printStackTrace(); // Memperbaiki pencetakan stack trace
             throw new Exception("Error upload file: " + e.getMessage());
         }
     }
 
-    private String getExtension(String fileName) {
-        return  fileName.split("\\.")[0];
+    private String getFileNameWithExtension(String fileName) {
+        return fileName != null && fileName.contains(".") ? fileName : null;
     }
 
     private File convertFile(MultipartFile multipartFile, String fileName) throws IOException {
         File file = new File(fileName);
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(multipartFile.getBytes());
-            fos.close();
         }
-        System.out.println("File size: " + file.length());
         return file;
     }
 
     private String uploadFile(File file, String fileName) throws IOException {
-        BlobId blobId = BlobId.of("bawaslu-a6bd2.appspot.com", fileName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+        BlobId blobId = BlobId.of("upload-image-example-a0910.appspot.com", fileName);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build(); // Sesuaikan content type
+
+        // Pastikan file `bawaslu-firebase.json` ada di classpath
         InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
+        if (serviceAccount == null) {
+            throw new IOException("Service account file not found");
+        }
+
         Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         storage.create(blobInfo, Files.readAllBytes(file.toPath()));
+
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
     }
 }
