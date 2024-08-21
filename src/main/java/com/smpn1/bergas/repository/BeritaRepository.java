@@ -18,7 +18,7 @@ public interface BeritaRepository extends CrudRepository<Berita, Integer> {
     Page<Berita> findAll(Pageable pageable);
     Page<Berita> findAllByOrderByUpdatedDateDesc(Pageable pageable);
     List<Berita> findFirst5ByOrderByUpdatedDateDesc();
-    @Query(value = "SELECT * FROM berita  WHERE category = :category", nativeQuery = true)
+    @Query(value = "SELECT * FROM berita  WHERE category = :category AND ORDER BY update_date DESC", nativeQuery = true)
     Page<Berita> findByCategoryBerita_Id(String category, Pageable pageable);
 
     @Query("SELECT p FROM Berita p WHERE " +
@@ -28,11 +28,6 @@ public interface BeritaRepository extends CrudRepository<Berita, Integer> {
     @Query("SELECT p FROM Berita p WHERE DATE_FORMAT(p.createdDate, '%Y-%m') LIKE CONCAT('%', :bulan, '%')")
     List<Berita> find(String bulan);
 
-    @Query(value = "SELECT * FROM berita t1 INNER JOIN tags_berita t2 ON t1.id = t2.berita_id WHERE t2.tags_id = :tags ", nativeQuery = true)
-    List<Berita> getAllByTags(@Param("tags") Long tagsId);
-
-    @Query(value = "SELECT * FROM berita  WHERE category = :category", nativeQuery = true)
-    List<Berita> getAllByCategory(String category);
 
     @Query("SELECT SUBSTRING(b.judulBerita, 1, LOCATE(' ', b.judulBerita) - 1) FROM Berita b WHERE b.id = :id")
     String getByIdBerita(Long id);

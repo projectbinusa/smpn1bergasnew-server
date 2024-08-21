@@ -1,5 +1,6 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Program;
 import com.smpn1.bergas.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class ProgramService {
     }
     public Page<Program> getAll(Pageable pageable){
         return programRepository.findAll(pageable);
+    }
+    public Page<Program> getAllTerbaru(Pageable pageable) {
+        return programRepository.getAll(pageable);
     }
     public Program edit(Program program ,Long id){
         Program update = programRepository.findById(id).orElse(null);

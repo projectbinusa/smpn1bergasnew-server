@@ -1,5 +1,6 @@
 package com.smpn1.bergas.controller;
 
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.TenagaKependidikan;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.TenagaKependidikanService;
@@ -59,6 +60,30 @@ public class TenagaKependidikanController {
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
             response.setMessage("Failed to retrieve tenaga kependidikan list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping(path = "/all/terbaru")
+    public ResponseEntity<CommonResponse<Page<TenagaKependidikan>>> listAllAlumniTerbaru(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        CommonResponse<Page<TenagaKependidikan>> response = new CommonResponse<>();
+        try {
+            Page<TenagaKependidikan> beritaPage = tenagaKependidikanService.getAllTerbaru(pageable);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage(" Alumni list retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve guru list: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

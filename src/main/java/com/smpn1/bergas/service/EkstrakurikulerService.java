@@ -1,5 +1,6 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Ekstrakurikuler;
 import com.smpn1.bergas.repository.EkstrakurikulerRepository;
 import com.google.auth.Credentials;
@@ -43,6 +44,9 @@ public class EkstrakurikulerService {
     }
     public Page<Ekstrakurikuler> getAll(Pageable pageable){
         return ekstrakurikulerRepository.findAll(pageable);
+    }
+    public Page<Ekstrakurikuler> getAllTerbaru(Pageable pageable) {
+        return ekstrakurikulerRepository.getAll(pageable);
     }
     public Ekstrakurikuler edit(Ekstrakurikuler ekstrakurikuler , Long id , MultipartFile multipartFile) throws Exception {
         String image = imageConverter(multipartFile);

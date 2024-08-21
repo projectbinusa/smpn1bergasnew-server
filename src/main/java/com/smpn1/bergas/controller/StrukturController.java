@@ -4,6 +4,7 @@ package com.smpn1.bergas.controller;
 
 import com.smpn1.bergas.DTO.StrukturDTO;
 import com.smpn1.bergas.model.Struktur;
+import com.smpn1.bergas.model.Struktur;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.StrukturService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,30 @@ public class StrukturController {
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
             response.setMessage("Failed to retrieve struktur list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping(path = "/all/terbaru")
+    public ResponseEntity<CommonResponse<Page<Struktur>>> listAllStrukturTerbaru(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        CommonResponse<Page<Struktur>> response = new CommonResponse<>();
+        try {
+            Page<Struktur> beritaPage = strukturService.getAllTerbaru(pageable);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage(" Struktur list retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve guru list: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

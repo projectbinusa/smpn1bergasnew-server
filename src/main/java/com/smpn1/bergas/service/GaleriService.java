@@ -1,5 +1,6 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Galeri;
 import com.smpn1.bergas.repository.GaleriRepository;
 import com.google.auth.Credentials;
@@ -41,6 +42,9 @@ public class GaleriService {
     }
     public Page<Galeri> getAll(Pageable pageable){
         return galeriRepository.findAll(pageable);
+    }
+    public Page<Galeri> getAllTerbaru(Pageable pageable) {
+        return galeriRepository.getAll(pageable);
     }
     public Galeri edit(Galeri galeri , MultipartFile multipartFile , Long id) throws Exception {
         Galeri update = galeriRepository.findById(id).orElse(null);

@@ -1,5 +1,6 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Prestasi;
 import com.smpn1.bergas.repository.PrestasiRepository;
 import com.google.auth.Credentials;
@@ -59,6 +60,9 @@ public class PrestasiService {
     }
     public Page<Prestasi> getAll(Pageable pageable){
         return prestasiRepository.findAll(pageable);
+    }
+    public Page<Prestasi> getAllTerbaru(Pageable pageable) {
+        return prestasiRepository.getAll(pageable);
     }
     public Map<String, Boolean> delete(Long id) {
         try {

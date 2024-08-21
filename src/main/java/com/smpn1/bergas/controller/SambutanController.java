@@ -3,6 +3,7 @@ package com.smpn1.bergas.controller;
 
 
 import com.smpn1.bergas.model.Sambutan;
+import com.smpn1.bergas.model.Sambutan;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.SambutanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +53,30 @@ public class SambutanController {
         CommonResponse<Page<Sambutan>> response = new CommonResponse<>();
         try {
             Page<Sambutan> beritaPage = sambutanService.getAll(pageable);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage(" Sambutan list retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve guru list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping(path = "/all/terbaru")
+    public ResponseEntity<CommonResponse<Page<Sambutan>>> listAllSambutanTerbaru(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        CommonResponse<Page<Sambutan>> response = new CommonResponse<>();
+        try {
+            Page<Sambutan> beritaPage = sambutanService.getAllTerbaru(pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);

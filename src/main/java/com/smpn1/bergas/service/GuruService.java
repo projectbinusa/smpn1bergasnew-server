@@ -1,5 +1,6 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Guru;
 import com.smpn1.bergas.repository.GuruRepository;
 import com.google.auth.Credentials;
@@ -42,6 +43,9 @@ public class GuruService {
     }
     public Page<Guru> getAll(Pageable pageable){
         return guruRepository.findAll(pageable);
+    }
+    public Page<Guru> getAllTerbaru(Pageable pageable) {
+        return guruRepository.getAll(pageable);
     }
     public Guru edit(Guru guru , MultipartFile multipartFile , Long id) throws Exception {
         Guru update = guruRepository.findById(id).orElse(null);

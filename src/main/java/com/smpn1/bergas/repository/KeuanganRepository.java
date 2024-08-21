@@ -9,8 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface KeuanganRepository extends JpaRepository<Keuangan , Long > {
-    @Query(value = "SELECT * FROM keuangan  WHERE category = :category", nativeQuery = true)
+    @Query(value = "SELECT * FROM keuangan  WHERE category = :category AND ORDER BY update_date DESC", nativeQuery = true)
     Page<Keuangan> findByCategoryKeuangan_Id(String category, Pageable pageable);
-    @Query(value = "SELECT * FROM keuangan  WHERE category = :category", nativeQuery = true)
-    List<Keuangan> getAllByCategory(String category);
+
+    @Query(value = "SELECT * FROM keuangan ORDER BY update_date DESC" ,nativeQuery = true)
+    Page<Keuangan> getAll(Pageable pageable);
 }

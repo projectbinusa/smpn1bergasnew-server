@@ -25,6 +25,9 @@ public class TenagaKependidikanService {
     public Page<TenagaKependidikan> getAll(Pageable pageable){
         return tenagaKependidikanRepository.findAll(pageable);
     }
+    public Page<TenagaKependidikan> getAllTerbaru(Pageable pageable) {
+        return tenagaKependidikanRepository.getAll(pageable);
+    }
     public TenagaKependidikan edit(TenagaKependidikan tenagaKependidikan ,Long id){
         TenagaKependidikan update = tenagaKependidikanRepository.findById(id).orElse(null);
         update.setStatus(tenagaKependidikan.getStatus());

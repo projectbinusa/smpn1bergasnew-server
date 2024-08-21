@@ -54,6 +54,9 @@ public class StrukturService {
         return strukturRepository.findAll(pageable);
     }
 
+    public Page<Struktur> getAllTerbaru(Pageable pageable) {
+        return strukturRepository.getAll(pageable);
+    }
     public Map<String, Boolean> delete(Long id) {
         try {
             strukturRepository.deleteById(id);

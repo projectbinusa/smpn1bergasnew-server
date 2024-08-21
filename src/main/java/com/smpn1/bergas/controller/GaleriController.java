@@ -2,6 +2,7 @@ package com.smpn1.bergas.controller;
 
 
 import com.smpn1.bergas.model.Galeri;
+import com.smpn1.bergas.model.Galeri;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.GaleriService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,30 @@ public class GaleriController {
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
             response.setMessage("Failed to retrieve galeri list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping(path = "/all/terbaru")
+    public ResponseEntity<CommonResponse<Page<Galeri>>> listAllGaleriTerbaru(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        CommonResponse<Page<Galeri>> response = new CommonResponse<>();
+        try {
+            Page<Galeri> beritaPage = galeriService.getAllTerbaru(pageable);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage(" Galeri list retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve guru list: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

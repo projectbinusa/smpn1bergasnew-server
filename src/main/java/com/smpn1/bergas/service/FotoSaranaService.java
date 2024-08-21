@@ -1,6 +1,7 @@
 package com.smpn1.bergas.service;
 
 import com.smpn1.bergas.DTO.FotoSaranaDTO;
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.FotoSarana;
 import com.smpn1.bergas.repository.FotoSaranaRepository;
 import com.smpn1.bergas.repository.SaranaRepository;
@@ -48,6 +49,9 @@ public class FotoSaranaService {
     }
     public Page<FotoSarana> getAll(Pageable pageable){
         return fotoSaranaRepository.findAll(pageable);
+    }
+    public Page<FotoSarana> getAllTerbaru(Pageable pageable) {
+        return fotoSaranaRepository.getAll(pageable);
     }
     public Page<FotoSarana> getAllBySarana(Long id ,Pageable pageable){
         return fotoSaranaRepository.findBySaranaId(id,pageable);

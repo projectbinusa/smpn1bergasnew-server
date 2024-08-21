@@ -25,6 +25,9 @@ public class VisiMisiService {
     public Page<VisiMisi> getAll(Pageable pageable){
         return visiMisiRepository.findAll(pageable);
     }
+    public Page<VisiMisi> getAllTerbaru(Pageable pageable) {
+        return visiMisiRepository.getAll(pageable);
+    }
     public VisiMisi edit(VisiMisi visiMisi ,Long id){
         VisiMisi update = visiMisiRepository.findById(id).orElse(null);
         update.setMisi(visiMisi.getMisi());

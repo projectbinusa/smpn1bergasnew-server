@@ -1,5 +1,6 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Sejarah;
 import com.smpn1.bergas.repository.SejarahRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class SejarahService {
     }
     public Page<Sejarah> getAll(Pageable pageable){
         return sejarahRepository.findAll(pageable);
+    }
+    public Page<Sejarah> getAllTerbaru(Pageable pageable) {
+        return sejarahRepository.getAll(pageable);
     }
     public Sejarah edit(Sejarah sejarah ,Long id){
         Sejarah update = sejarahRepository.findById(id).orElse(null);
