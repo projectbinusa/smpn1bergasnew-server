@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface SejarahRepository extends JpaRepository<Sejarah , Long> {
-    @Query(value = "SELECT * FROM sejarah ORDER BY update_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM sejarah ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Sejarah> getAll(Pageable pageable);
 }

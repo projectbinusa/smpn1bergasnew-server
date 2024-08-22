@@ -10,6 +10,6 @@ public interface FotoSaranaRepository extends JpaRepository<FotoSarana , Long> {
     @Query(value = "SELECT * FROM foto_sarana WHERE sarana_id = :id" , nativeQuery = true)
     Page<FotoSarana> findBySaranaId(Long id , Pageable pageable);
 
-    @Query(value = "SELECT * FROM foto_sarana ORDER BY update_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM foto_sarana ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<FotoSarana> getAll(Pageable pageable);
 }

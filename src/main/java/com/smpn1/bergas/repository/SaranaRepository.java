@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface SaranaRepository extends JpaRepository<Sarana , Long > {
-    @Query(value = "SELECT * FROM sarana ORDER BY update_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM sarana ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Sarana> getAll(Pageable pageable);
 }
