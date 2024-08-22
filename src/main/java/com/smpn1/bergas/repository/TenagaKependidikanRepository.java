@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface TenagaKependidikanRepository extends JpaRepository<TenagaKependidikan , Long> {
-    @Query(value = "SELECT * FROM tenaga_kependidikan ORDER BY update_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM tenaga_kependidikan ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<TenagaKependidikan> getAll(Pageable pageable);
 }

@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface KotakSaranRepository extends JpaRepository<KotakSaran ,Long> {
-    @Query(value = "SELECT * FROM kotak_saran ORDER BY update_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM kotak_saran ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<KotakSaran> getAll(Pageable pageable);
 }

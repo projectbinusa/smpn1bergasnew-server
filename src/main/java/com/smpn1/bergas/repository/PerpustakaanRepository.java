@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface PerpustakaanRepository extends JpaRepository<Perpustakaan ,Long> {
-    @Query(value = "SELECT * FROM perpustakaan ORDER BY update_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM perpustakaan ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Perpustakaan> getAll(Pageable pageable);
 }

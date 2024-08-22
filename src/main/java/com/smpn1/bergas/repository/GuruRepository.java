@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface GuruRepository extends JpaRepository<Guru, Long> {
-    @Query(value = "SELECT * FROM guru ORDER BY update_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM guru ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Guru> getAll(Pageable pageable);
 
 }

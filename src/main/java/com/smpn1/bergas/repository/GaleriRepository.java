@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface GaleriRepository extends JpaRepository<Galeri , Long> {
-    @Query(value = "SELECT * FROM galeri ORDER BY update_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM galeri ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Galeri> getAll(Pageable pageable);
 }

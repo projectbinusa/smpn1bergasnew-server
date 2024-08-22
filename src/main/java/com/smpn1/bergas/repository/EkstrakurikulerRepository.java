@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface EkstrakurikulerRepository extends JpaRepository<Ekstrakurikuler , Long> {
-    @Query(value = "SELECT * FROM ekstrakurikuler ORDER BY update_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM ekstrakurikuler ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Ekstrakurikuler> getAll(Pageable pageable);
 }
