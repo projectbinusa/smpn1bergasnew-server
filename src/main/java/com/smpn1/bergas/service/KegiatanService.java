@@ -31,7 +31,7 @@ public class KegiatanService {
     @Autowired
     private KegiatanRepository kegiatanRepository;
 
-    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-a0910.appspot.com/o/%s?alt=media";
+    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
 
     public Kegiatan add(Kegiatan kegiatan, MultipartFile multipartFile) throws Exception {
         String image = imageConverter(multipartFile);
@@ -101,7 +101,7 @@ public class KegiatanService {
     }
 
     private String uploadFile(File file, String fileName) throws IOException {
-        BlobId blobId = BlobId.of("upload-image-example-a0910.appspot.com", fileName);
+        BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com", fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
         InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
         Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
