@@ -2,6 +2,7 @@ package com.smpn1.bergas.controller;
 
 
 import com.smpn1.bergas.model.Alumni;
+import com.smpn1.bergas.model.Kontak;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.AlumniService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,7 @@ public class AlumniController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping(path = "/all")
     public ResponseEntity<CommonResponse<Page<Alumni>>> listAllAlumni(
             @RequestParam(defaultValue = "0") int page,
@@ -65,6 +67,7 @@ public class AlumniController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<Alumni>>> listAllAlumniTerbaru(
             @RequestParam(defaultValue = "0") int page,
@@ -89,6 +92,7 @@ public class AlumniController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
     public ResponseEntity<CommonResponse<Alumni>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
         CommonResponse<Alumni> response = new CommonResponse<>();
@@ -107,8 +111,10 @@ public class AlumniController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    //    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
     @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Alumni>> updateAlumni(@PathVariable("id") Long id, Alumni prestasi,  @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Alumni>> updateAlumni(@PathVariable("id") Long id, Alumni prestasi, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
         CommonResponse<Alumni> response = new CommonResponse<>();
         try {
             Alumni tabelDip = alumniService.edit(prestasi, multipartFile, id);
@@ -125,6 +131,7 @@ public class AlumniController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> delete(@PathVariable("id") Long id) {
         return ResponseEntity.ok(alumniService.delete(id));

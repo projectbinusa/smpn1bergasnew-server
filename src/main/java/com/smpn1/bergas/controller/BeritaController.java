@@ -76,6 +76,7 @@ public class BeritaController {
         }
     }
 
+//    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
     @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
     public ResponseEntity<CommonResponse<Berita>> updateBerita(@PathVariable("id") Long id, BeritaDTO berita, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
         CommonResponse<Berita> response = new CommonResponse<>();
