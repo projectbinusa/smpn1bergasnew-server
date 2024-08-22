@@ -80,6 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/smpn1bergas/api/kegiatan/get/**",
             "/smpn1bergas/api/keuangan/all/**",
             "/smpn1bergas/api/keuangan/get/**",
+            "/smpn1bergas/api/keuangan/category",
             "/smpn1bergas/api/kontak/all/**",
             "/smpn1bergas/api/kontak/get/**",
             "/smpn1bergas/api/prestasi/all/**",
