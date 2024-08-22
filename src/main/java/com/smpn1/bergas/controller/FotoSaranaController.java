@@ -110,7 +110,7 @@ public class FotoSaranaController {
         }
     }
     @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<FotoSarana>> updateFotoSarana(@PathVariable("id") Long id, FotoSaranaDTO fotoSarana,  @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<FotoSarana>> updateFotoSarana(@PathVariable("id") Long id,FotoSaranaDTO fotoSarana,  @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
         CommonResponse<FotoSarana> response = new CommonResponse<>();
         try {
             FotoSarana fotoSarana1 = fotoSaranaService.edit(fotoSarana, multipartFile, id);

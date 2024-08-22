@@ -108,6 +108,7 @@ public class GaleriController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
     public ResponseEntity<CommonResponse<Galeri>> updateGaleri(@PathVariable("id") Long id, Galeri galeri,  @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
         CommonResponse<Galeri> response = new CommonResponse<>();
