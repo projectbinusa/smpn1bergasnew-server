@@ -1,11 +1,9 @@
 package com.smpn1.bergas.controller;
 
 
-
-import com.smpn1.bergas.model.Sambutan;
-import com.smpn1.bergas.model.Sambutan;
+import com.smpn1.bergas.model.Perpustakaan;
 import com.smpn1.bergas.response.CommonResponse;
-import com.smpn1.bergas.service.SambutanService;
+import com.smpn1.bergas.service.PerpustakaanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,45 +17,45 @@ import java.sql.SQLException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/smpn1bergas/api/sambutan")
+@RequestMapping("/smpn1bergas/api/perpustakaan")
 @CrossOrigin(origins = "*")
-public class SambutanController {
+public class PerpustakaanController {
     @Autowired
-    private SambutanService sambutanService;
+    private PerpustakaanService perpustakaanService;
 
-    @PostMapping(path = "/add",  consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Sambutan>> add(Sambutan sambutan ,@RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
-        CommonResponse<Sambutan> response = new CommonResponse<>();
+    @PostMapping(path = "/add", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<Perpustakaan>> add(Perpustakaan perpustakaan, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+        CommonResponse<Perpustakaan> response = new CommonResponse<>();
         try {
-            Sambutan sambutan1 = sambutanService.add(sambutan , multipartFile);
+            Perpustakaan perpustakaan1 = perpustakaanService.add(perpustakaan, multipartFile);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
-            response.setData(sambutan1);
-            response.setMessage("Sambutan created successfully.");
+            response.setData(perpustakaan1);
+            response.setMessage("Perpustakaan created successfully.");
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
-            response.setMessage("Failed to create sambutan: " + e.getMessage());
+            response.setMessage("Failed to create perpustakaan: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @GetMapping(path = "/all")
-    public ResponseEntity<CommonResponse<Page<Sambutan>>> listAllSambutan(
+    public ResponseEntity<CommonResponse<Page<Perpustakaan>>> listAllPerpustakaan(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        CommonResponse<Page<Sambutan>> response = new CommonResponse<>();
+        CommonResponse<Page<Perpustakaan>> response = new CommonResponse<>();
         try {
-            Page<Sambutan> beritaPage = sambutanService.getAll(pageable);
+            Page<Perpustakaan> beritaPage = perpustakaanService.getAll(pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
-            response.setMessage(" Sambutan list retrieved successfully.");
+            response.setMessage(" Perpustakaan list retrieved successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setStatus("error");
@@ -68,20 +66,20 @@ public class SambutanController {
         }
     }
     @GetMapping(path = "/all/terbaru")
-    public ResponseEntity<CommonResponse<Page<Sambutan>>> listAllSambutanTerbaru(
+    public ResponseEntity<CommonResponse<Page<Perpustakaan>>> listAllPerpustakaanTerbaru(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        CommonResponse<Page<Sambutan>> response = new CommonResponse<>();
+        CommonResponse<Page<Perpustakaan>> response = new CommonResponse<>();
         try {
-            Page<Sambutan> beritaPage = sambutanService.getAllTerbaru(pageable);
+            Page<Perpustakaan> beritaPage = perpustakaanService.getAllTerbaru(pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
-            response.setMessage(" Sambutan list retrieved successfully.");
+            response.setMessage(" Perpustakaan list retrieved successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setStatus("error");
@@ -92,43 +90,43 @@ public class SambutanController {
         }
     }
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public ResponseEntity<CommonResponse<Sambutan>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
-        CommonResponse<Sambutan> response = new CommonResponse<>();
+    public ResponseEntity<CommonResponse<Perpustakaan>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
+        CommonResponse<Perpustakaan> response = new CommonResponse<>();
         try {
-            Sambutan categoryBerita = sambutanService.getById(id);
+            Perpustakaan categoryBerita = perpustakaanService.getByid(id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(categoryBerita);
-            response.setMessage("Sambutan get successfully.");
+            response.setMessage("Perpustakaan get successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
-            response.setMessage("Failed to get sambutan: " + e.getMessage());
+            response.setMessage("Failed to get perpustakaan: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping(path = "/put/{id}",  consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Sambutan>> updateSambutan(@PathVariable("id") Long id, Sambutan sambutan , @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
-        CommonResponse<Sambutan> response = new CommonResponse<>();
+    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<Perpustakaan>> updatePerpustakaan(@PathVariable("id") Long id, Perpustakaan perpustakaan,  @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+        CommonResponse<Perpustakaan> response = new CommonResponse<>();
         try {
-            Sambutan tabelDip = sambutanService.edit(sambutan, multipartFile ,id );
+            Perpustakaan tabelDip = perpustakaanService.edit(perpustakaan, multipartFile, id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(tabelDip);
-            response.setMessage("Sambutan updated successfully.");
+            response.setMessage("Perpustakaan updated successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
-            response.setMessage("Failed to update sambutan : " + e.getMessage());
+            response.setMessage("Failed to update perpustakaan : " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> delete(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(sambutanService.delete(id));
+        return ResponseEntity.ok(perpustakaanService.delete(id));
     }
 }

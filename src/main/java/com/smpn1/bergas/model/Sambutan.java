@@ -20,6 +20,17 @@ public class Sambutan extends DateConfig {
 
     @Column(name = "NIP")
     private String nip;
+    @Lob
+    @Column(name = "foto")
+    private String foto;
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
+    }
 
     public Long getId() {
         return id;
