@@ -225,7 +225,7 @@ public class BeritaController {
             @RequestParam("category") String category,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            @RequestParam(value = "sort", defaultValue = "createdDate") String sort,
+            @RequestParam(value = "sort", defaultValue = "created_date") String sort,
             @RequestParam(value = "order", defaultValue = "asc") String order) {
         try {
             Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort));

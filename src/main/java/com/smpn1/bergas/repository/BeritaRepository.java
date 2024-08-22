@@ -18,7 +18,7 @@ public interface BeritaRepository extends CrudRepository<Berita, Integer> {
     Page<Berita> findAll(Pageable pageable);
     Page<Berita> findAllByOrderByUpdatedDateDesc(Pageable pageable);
     List<Berita> findFirst5ByOrderByUpdatedDateDesc();
-    @Query(value = "SELECT * FROM berita  WHERE category = :category AND ORDER BY update_date DESC", nativeQuery = true)
+    @Query(value = "SELECT * FROM berita  WHERE category = :category ", nativeQuery = true)
     Page<Berita> findByCategoryBerita_Id(String category, Pageable pageable);
 
     @Query("SELECT p FROM Berita p WHERE " +
