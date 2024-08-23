@@ -29,6 +29,28 @@ public class Alumni extends DateConfig {
     @Column(name = "kontak")
     private String kontak;
 
+    @Column(name = "nip")
+    private String nip;
+
+    @Column(name = "riwayat_pendidikan")
+    private String riwayat;
+
+    public String getNip() {
+        return nip;
+    }
+
+    public void setNip(String nip) {
+        this.nip = nip;
+    }
+
+    public String getRiwayat() {
+        return riwayat;
+    }
+
+    public void setRiwayat(String riwayat) {
+        this.riwayat = riwayat;
+    }
+
     public String getTahunLulus() {
         return tahunLulus;
     }
