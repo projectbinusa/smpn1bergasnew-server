@@ -20,6 +20,60 @@ public class Alumni extends DateConfig {
     @Lob
     @Column(name = "foto")
     private String foto;
+    @Column(name = "tahun_lulus")
+    private String tahunLulus;
+
+    @Column(name = "profesi")
+    private String profesi;
+
+    @Column(name = "kontak")
+    private String kontak;
+
+    @Column(name = "nip")
+    private String nip;
+
+    @Column(name = "riwayat_pendidikan")
+    private String riwayat;
+
+    public String getNip() {
+        return nip;
+    }
+
+    public void setNip(String nip) {
+        this.nip = nip;
+    }
+
+    public String getRiwayat() {
+        return riwayat;
+    }
+
+    public void setRiwayat(String riwayat) {
+        this.riwayat = riwayat;
+    }
+
+    public String getTahunLulus() {
+        return tahunLulus;
+    }
+
+    public void setTahunLulus(String tahunLulus) {
+        this.tahunLulus = tahunLulus;
+    }
+
+    public String getProfesi() {
+        return profesi;
+    }
+
+    public void setProfesi(String profesi) {
+        this.profesi = profesi;
+    }
+
+    public String getKontak() {
+        return kontak;
+    }
+
+    public void setKontak(String kontak) {
+        this.kontak = kontak;
+    }
 
     public Long getId() {
         return id;

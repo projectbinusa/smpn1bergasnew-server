@@ -63,6 +63,11 @@ public class AlumniService {
             update.setBiografi(alumni.getBiografi());
             update.setNama(alumni.getNama());
             update.setFoto(image);
+            update.setKontak(alumni.getKontak());
+            update.setProfesi(alumni.getProfesi());
+            update.setTahunLulus(alumni.getTahunLulus());
+            update.setNip(alumni.getNip());
+            update.setRiwayat(alumni.getRiwayat());
             return alumniRepository.save(update);
         }
         return null;
