@@ -99,7 +99,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/smpn1bergas/api/tenaga_kependidikan/get/**",
             "/smpn1bergas/api/visiMisi/all/**",
             "/smpn1bergas/api/visiMisi/get/**",
-            "/smpn1bergas/api/kotak_saran/add"
+            "/smpn1bergas/api/kotak_saran/add",
+            "smpn1bergas/api/perpustakaan/get/**",
+            "smpn1bergas/api/perpustakaan/all/**"
 
     };
 
