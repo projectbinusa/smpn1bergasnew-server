@@ -24,7 +24,7 @@ public class SejarahController {
     private SejarahService sejarahService;
 
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Sejarah>> add(Sejarah sejarah) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Sejarah>> add(@RequestBody Sejarah sejarah) throws SQLException, ClassNotFoundException {
         CommonResponse<Sejarah> response = new CommonResponse<>();
         try {
             Sejarah sejarah1 = sejarahService.add(sejarah);

@@ -17,6 +17,11 @@ public class VisiMisi extends DateConfig {
     @Column(name = "misi")
     private String misi;
 
+    @Column(name = "tujuan")
+    private String tujuan;
+
+
+
     public Long getId() {
         return id;
     }
@@ -39,5 +44,13 @@ public class VisiMisi extends DateConfig {
 
     public void setMisi(String misi) {
         this.misi = misi;
+    }
+
+    public String getTujuan() {
+        return tujuan;
+    }
+
+    public void setTujuan(String tujuan) {
+        this.tujuan = tujuan;
     }
 }
