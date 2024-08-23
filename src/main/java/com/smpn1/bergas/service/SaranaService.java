@@ -29,6 +29,9 @@ public class SaranaService {
     public Page<Sarana> getAllTerbaru(Pageable pageable) {
         return saranaRepository.getAll(pageable);
     }
+    public Page<Sarana> getAllCategory(String category ,Pageable pageable) {
+        return saranaRepository.getAllByCategory(category,pageable);
+    }
     public Sarana edit(Sarana sarana ,Long id){
         Sarana update = saranaRepository.findById(id).orElse(null);
         update.setNama_sarana(sarana.getNama_sarana());
