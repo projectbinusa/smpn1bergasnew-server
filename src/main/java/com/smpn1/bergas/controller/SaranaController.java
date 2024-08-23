@@ -89,6 +89,31 @@ public class SaranaController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping(path = "/all/category")
+    public ResponseEntity<CommonResponse<Page<Sarana>>> listAllSaranaCategory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size ,
+            @RequestParam("category") String category
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        CommonResponse<Page<Sarana>> response = new CommonResponse<>();
+        try {
+            Page<Sarana> beritaPage = saranaService.getAllCategory(category,pageable);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage(" Sarana list retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve guru list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
     public ResponseEntity<CommonResponse<Sarana>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
         CommonResponse<Sarana> response = new CommonResponse<>();
