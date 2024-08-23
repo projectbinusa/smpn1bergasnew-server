@@ -1,5 +1,7 @@
 package com.smpn1.bergas.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Guru;
 import com.smpn1.bergas.repository.GuruRepository;
@@ -12,7 +14,11 @@ import com.google.cloud.storage.StorageOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -28,13 +34,14 @@ import java.util.Map;
 
 @Service
 public class GuruService {
+    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
     @Autowired
     private GuruRepository guruRepository;
 
     public Guru add(Guru guru , MultipartFile multipartFile) throws Exception {
-        String image = imageConverter(multipartFile);
+        String image = uploadFile(multipartFile);
         guru.setFoto(image);
         return guruRepository.save(guru);
     }
@@ -51,7 +58,7 @@ public class GuruService {
         Guru update = guruRepository.findById(id).orElse(null);
         update.setMapel(guru.getMapel());
         update.setNama_guru(guru.getNama_guru());
-        String image = imageConverter(multipartFile);
+        String image = uploadFile(multipartFile);
         update.setFoto(image);
         return guruRepository.save(update);
     }
@@ -67,41 +74,62 @@ public class GuruService {
         }
     }
 
+    private String extractFileUrlFromResponse(String responseBody) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonResponse = mapper.readTree(responseBody);
+        JsonNode dataNode = jsonResponse.path("data");
+        String urlFile = dataNode.path("url_file").asText();
 
-    private String imageConverter(MultipartFile multipartFile) throws Exception {
-        try {
-            String fileName = getExtension(multipartFile.getOriginalFilename());
-            File file = convertFile(multipartFile, fileName);
-            var RESPONSE_URL = uploadFile(file, fileName);
-            file.delete();
-            return RESPONSE_URL;
-        } catch (Exception e) {
-            e.getStackTrace();
-            throw new Exception("Error upload file: " + e.getMessage());
-        }
+        return urlFile;
     }
 
-    private String getExtension(String fileName) {
-        return  fileName.split("\\.")[0];
-    }
+    private String uploadFile(MultipartFile multipartFile) throws IOException {
+        RestTemplate restTemplate = new RestTemplate();
+        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", multipartFile.getResource());
 
-    private File convertFile(MultipartFile multipartFile, String fileName) throws IOException {
-        File file = new File(fileName);
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(multipartFile.getBytes());
-            fos.close();
-        }
-        System.out.println("File size: " + file.length());
-        return file;
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = restTemplate.exchange(base_url, HttpMethod.POST, requestEntity, String.class);
+        String fileUrl = extractFileUrlFromResponse(response.getBody());
+        return fileUrl;
     }
-
-    private String uploadFile(File file, String fileName) throws IOException {
-        BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com", fileName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
-        Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        storage.create(blobInfo, Files.readAllBytes(file.toPath()));
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
-    }
+//    private String imageConverter(MultipartFile multipartFile) throws Exception {
+//        try {
+//            String fileName = getExtension(multipartFile.getOriginalFilename());
+//            File file = convertFile(multipartFile, fileName);
+//            var RESPONSE_URL = uploadFile(file, fileName);
+//            file.delete();
+//            return RESPONSE_URL;
+//        } catch (Exception e) {
+//            e.getStackTrace();
+//            throw new Exception("Error upload file: " + e.getMessage());
+//        }
+//    }
+//
+//    private String getExtension(String fileName) {
+//        return  fileName.split("\\.")[0];
+//    }
+//
+//    private File convertFile(MultipartFile multipartFile, String fileName) throws IOException {
+//        File file = new File(fileName);
+//        try (FileOutputStream fos = new FileOutputStream(file)) {
+//            fos.write(multipartFile.getBytes());
+//            fos.close();
+//        }
+//        System.out.println("File size: " + file.length());
+//        return file;
+//    }
+//
+//    private String uploadFile(File file, String fileName) throws IOException {
+//        BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com", fileName);
+//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+//        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
+//        Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
+//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+//        storage.create(blobInfo, Files.readAllBytes(file.toPath()));
+//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+//    }
 }

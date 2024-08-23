@@ -3,6 +3,7 @@ package com.smpn1.bergas.controller;
 
 import com.smpn1.bergas.DTO.FotoKegiatanDTO;
 import com.smpn1.bergas.model.FotoKegiatan;
+import com.smpn1.bergas.model.Kegiatan;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.FotoKegiatanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +110,7 @@ public class FotoKegiatanController {
         }
     }
     @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<FotoKegiatan>> updateFotoKegiatan(@PathVariable("id") Long id, FotoKegiatanDTO fotoKegiatan,  @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<FotoKegiatan>> updateFotoKegiatan(@PathVariable("id") Long id, FotoKegiatanDTO fotoKegiatan, @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
         CommonResponse<FotoKegiatan> response = new CommonResponse<>();
         try {
             FotoKegiatan fotoKegiatan1 = fotoKegiatanService.edit(fotoKegiatan, multipartFile, id);
