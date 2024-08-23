@@ -24,7 +24,7 @@ public class SaranaController {
     private SaranaService saranaService;
 
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Sarana>> add(Sarana sarana) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Sarana>> add(@RequestBody Sarana sarana) throws SQLException, ClassNotFoundException {
         CommonResponse<Sarana> response = new CommonResponse<>();
         try {
             Sarana sarana1 = saranaService.add(sarana);

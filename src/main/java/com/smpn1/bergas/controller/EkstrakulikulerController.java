@@ -25,7 +25,7 @@ public class EkstrakulikulerController {
     private EkstrakurikulerService ekstrakurikulerService;
 
     @PostMapping(path = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Ekstrakurikuler>> add(Ekstrakurikuler ekstrakurikuler , MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Ekstrakurikuler>> add(Ekstrakurikuler ekstrakurikuler ,@RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
         CommonResponse<Ekstrakurikuler> response = new CommonResponse<>();
         try {
             Ekstrakurikuler ekstrakurikuler1 = ekstrakurikulerService.add(ekstrakurikuler , multipartFile);

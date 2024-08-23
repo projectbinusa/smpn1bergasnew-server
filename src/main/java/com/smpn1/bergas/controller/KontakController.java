@@ -25,7 +25,7 @@ public class KontakController {
     private KontakService kontakService;
 
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Kontak>> add(Kontak kontak) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Kontak>> add(@RequestBody Kontak kontak) throws SQLException, ClassNotFoundException {
         CommonResponse<Kontak> response = new CommonResponse<>();
         try {
             Kontak kontak1 = kontakService.add(kontak);

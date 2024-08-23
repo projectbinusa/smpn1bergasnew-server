@@ -22,7 +22,7 @@ public class KotakSaranController {
     private KotakSaranService kotakSaranService;
 
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<KotakSaran>> add(KotakSaran kotakSaran) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<KotakSaran>> add(@RequestBody KotakSaran kotakSaran) throws SQLException, ClassNotFoundException {
         CommonResponse<KotakSaran> response = new CommonResponse<>();
         try {
             KotakSaran kotakSaran1 = kotakSaranService.add(kotakSaran);

@@ -18,11 +18,23 @@ public class Sambutan extends DateConfig {
     @Column(name = "isi_sambutan")
     private String isi;
 
+    @Column(name = "judul")
+    private String judul;
+
+
     @Column(name = "NIP")
     private String nip;
     @Lob
     @Column(name = "foto")
     private String foto;
+
+    public String getJudul() {
+        return judul;
+    }
+
+    public void setJudul(String judul) {
+        this.judul = judul;
+    }
 
     public String getFoto() {
         return foto;

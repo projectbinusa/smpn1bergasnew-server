@@ -32,6 +32,7 @@ public class VisiMisiService {
         VisiMisi update = visiMisiRepository.findById(id).orElse(null);
         update.setMisi(visiMisi.getMisi());
         update.setVisi(visiMisi.getVisi());
+        update.setTujuan(visiMisi.getTujuan());
         return visiMisiRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {

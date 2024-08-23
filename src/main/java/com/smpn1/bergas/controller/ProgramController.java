@@ -24,7 +24,7 @@ public class ProgramController {
     private ProgramService programService;
 
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Program>> add(Program program) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Program>> add(@RequestBody Program program) throws SQLException, ClassNotFoundException {
         CommonResponse<Program> response = new CommonResponse<>();
         try {
             Program program1 = programService.add(program);

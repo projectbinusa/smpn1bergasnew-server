@@ -23,7 +23,7 @@ public class VisiMisiController {
     private VisiMisiService visiMisiService;
 
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<VisiMisi>> add(VisiMisi visiMisi) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<VisiMisi>> add(@RequestBody VisiMisi visiMisi) throws SQLException, ClassNotFoundException {
         CommonResponse<VisiMisi> response = new CommonResponse<>();
         try {
             VisiMisi visiMisi1 = visiMisiService.add(visiMisi);

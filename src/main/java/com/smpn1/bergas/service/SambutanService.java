@@ -59,6 +59,7 @@ public class SambutanService {
         update.setNama(sambutan.getNama());
         update.setIsi(sambutan.getIsi());
         update.setNip(sambutan.getNip());
+        update.setJudul(sambutan.getJudul());
         return sambutanRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {

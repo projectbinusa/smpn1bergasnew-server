@@ -22,7 +22,7 @@ public class TenagaKependidikanController {
     @Autowired
     private TenagaKependidikanService tenagaKependidikanService;
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<TenagaKependidikan>> add(TenagaKependidikan tenaga) {
+    public ResponseEntity<CommonResponse<TenagaKependidikan>> add(@RequestBody TenagaKependidikan tenaga) {
         CommonResponse<TenagaKependidikan> response = new CommonResponse<>();
         try {
             TenagaKependidikan tenaga1 = tenagaKependidikanService.add(tenaga);
