@@ -56,6 +56,9 @@ public class KegiatanService {
     public Page<Kegiatan> getAllTerbaru(Pageable pageable) {
         return kegiatanRepository.getAll(pageable);
     }
+    public Page<Kegiatan> getByCategory(String category , Pageable pageable){
+        return kegiatanRepository.getByCategory(category,pageable);
+    }
 
     public Map<String, Boolean> delete(Long id) {
         try {

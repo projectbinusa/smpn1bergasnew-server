@@ -9,4 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface ProgramRepository extends JpaRepository<Program , Long> {
     @Query(value = "SELECT * FROM program ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Program> getAll(Pageable pageable);
+
+    @Query(value = "SELECT * FROM program WHERE judul_program = :judul", nativeQuery = true)
+    Page<Program> getByJudul(String judul , Pageable pageable);
 }

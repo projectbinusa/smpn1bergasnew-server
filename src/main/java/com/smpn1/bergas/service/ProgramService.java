@@ -29,6 +29,9 @@ public class ProgramService {
     public Page<Program> getAllTerbaru(Pageable pageable) {
         return programRepository.getAll(pageable);
     }
+    public Page<Program> getByJudul(String judul , Pageable pageable){
+        return programRepository.getByJudul(judul, pageable);
+    }
     public Program edit(Program program ,Long id){
         Program update = programRepository.findById(id).orElse(null);
         update.setJudulProgram(program.getJudulProgram());
