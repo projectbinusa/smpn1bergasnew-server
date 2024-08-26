@@ -91,6 +91,31 @@ public class FotoSaranaController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping(path = "/all/by_id_sarana")
+    public ResponseEntity<CommonResponse<Page<FotoSarana>>> listAllFotoSaranaByIdSarana(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam("id_sarana") Long id
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        CommonResponse<Page<FotoSarana>> response = new CommonResponse<>();
+        try {
+            Page<FotoSarana> beritaPage = fotoSaranaService.getAllBySarana(id,pageable);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage(" FotoSarana list retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve guru list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
     public ResponseEntity<CommonResponse<FotoSarana>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
         CommonResponse<FotoSarana> response = new CommonResponse<>();
