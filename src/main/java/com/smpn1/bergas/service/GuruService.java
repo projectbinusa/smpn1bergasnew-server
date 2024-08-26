@@ -60,6 +60,8 @@ public class GuruService {
         update.setNama_guru(guru.getNama_guru());
         String image = uploadFile(multipartFile);
         update.setFoto(image);
+        update.setNip(guru.getNip());
+        update.setRiwayat(guru.getRiwayat());
         return guruRepository.save(update);
     }
 

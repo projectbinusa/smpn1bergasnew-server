@@ -20,6 +20,28 @@ public class Guru  extends DateConfig {
     @Column(name = "foto")
     private String foto;
 
+    @Column(name = "nip")
+    private String nip;
+
+    @Column(name = "riwayat_pendidikan")
+    private String riwayat;
+
+    public String getNip() {
+        return nip;
+    }
+
+    public void setNip(String nip) {
+        this.nip = nip;
+    }
+
+    public String getRiwayat() {
+        return riwayat;
+    }
+
+    public void setRiwayat(String riwayat) {
+        this.riwayat = riwayat;
+    }
+
     public Long getId() {
         return id;
     }
