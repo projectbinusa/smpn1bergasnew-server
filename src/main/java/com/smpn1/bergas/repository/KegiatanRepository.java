@@ -9,4 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface KegiatanRepository extends JpaRepository<Kegiatan , Long> {
     @Query(value = "SELECT * FROM kegiatan ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Kegiatan> getAll(Pageable pageable);
+
+    @Query(value = "SELECT * FROM kegiatan WHERE category = :category", nativeQuery = true)
+    Page<Kegiatan> getByCategory(String category , Pageable pageable);
 }

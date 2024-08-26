@@ -30,6 +30,17 @@ public class Kegiatan extends DateConfig {
     @JsonFormat(pattern = "yyyy-MM-dd" , timezone = "Asia/Jakarta")
     private Date tanggal;
 
+    @Column(name = "category")
+    private String category;
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public Long getId() {
         return id;
     }
