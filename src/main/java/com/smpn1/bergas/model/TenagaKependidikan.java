@@ -17,6 +17,11 @@ public class TenagaKependidikan extends DateConfig {
     @Column(name = "status")
     private String status;
 
+    @Lob
+    @Column(name = "foto")
+    private String foto;
+
+
     public Long getId() {
         return id;
     }
@@ -39,5 +44,13 @@ public class TenagaKependidikan extends DateConfig {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 }

@@ -1,6 +1,7 @@
 package com.smpn1.bergas.controller;
 
 import com.smpn1.bergas.model.Alumni;
+import com.smpn1.bergas.model.Guru;
 import com.smpn1.bergas.model.TenagaKependidikan;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.TenagaKependidikanService;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.SQLException;
 import java.util.Map;
@@ -21,11 +23,11 @@ import java.util.Map;
 public class TenagaKependidikanController {
     @Autowired
     private TenagaKependidikanService tenagaKependidikanService;
-    @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<TenagaKependidikan>> add(@RequestBody TenagaKependidikan tenaga) {
+    @PostMapping(path = "/add", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<TenagaKependidikan>> add(TenagaKependidikan tenaga, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
         CommonResponse<TenagaKependidikan> response = new CommonResponse<>();
         try {
-            TenagaKependidikan tenaga1 = tenagaKependidikanService.add(tenaga);
+            TenagaKependidikan tenaga1 = tenagaKependidikanService.add(tenaga, multipartFile);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(tenaga1);
@@ -105,11 +107,11 @@ public class TenagaKependidikanController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping(path = "/put/{id}", produces = "application/json")
-    public ResponseEntity<CommonResponse<TenagaKependidikan>> updateTenagaKependidikan(@PathVariable("id") Long id, @RequestBody TenagaKependidikan tenaga ) throws SQLException, ClassNotFoundException {
+    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<TenagaKependidikan>> updateTenagaKependidikan(@PathVariable("id") Long id, TenagaKependidikan tenaga, @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
         CommonResponse<TenagaKependidikan> response = new CommonResponse<>();
         try {
-            TenagaKependidikan tabelDip = tenagaKependidikanService.edit(tenaga, id);
+            TenagaKependidikan tabelDip = tenagaKependidikanService.edit(tenaga, multipartFile, id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(tabelDip);
