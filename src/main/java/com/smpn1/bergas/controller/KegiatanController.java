@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Map;
 
 @RestController
@@ -102,6 +103,31 @@ public class KegiatanController {
         CommonResponse<Page<Kegiatan>> response = new CommonResponse<>();
         try {
             Page<Kegiatan> beritaPage = kegiatanService.getByCategory(kategory, pageable);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage(" Kegiatan list retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve keuangan list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping(path = "/get/tanggal")
+    public ResponseEntity<CommonResponse<Page<Kegiatan>>> getByTanggal(
+            @RequestParam(name = "tanggal") Date tanggal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        CommonResponse<Page<Kegiatan>> response = new CommonResponse<>();
+        try {
+            Page<Kegiatan> beritaPage = kegiatanService.getByTanggal(tanggal, pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);

@@ -29,6 +29,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,6 +59,9 @@ public class KegiatanService {
     }
     public Page<Kegiatan> getByCategory(String category , Pageable pageable){
         return kegiatanRepository.getByCategory(category,pageable);
+    }
+    public Page<Kegiatan> getByTanggal(Date tanggal , Pageable pageable){
+        return kegiatanRepository.getByTanggal(tanggal,pageable);
     }
 
     public Map<String, Boolean> delete(Long id) {
