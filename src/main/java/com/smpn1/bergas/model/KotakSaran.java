@@ -1,10 +1,12 @@
 package com.smpn1.bergas.model;
 
+import com.smpn1.bergas.auditing.DateConfig;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "kotak_saran")
-public class KotakSaran {
+public class KotakSaran extends DateConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
