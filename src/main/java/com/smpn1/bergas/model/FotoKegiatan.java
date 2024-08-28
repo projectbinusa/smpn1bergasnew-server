@@ -5,7 +5,7 @@ import com.smpn1.bergas.auditing.DateConfig;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "fot_kegiatan")
+@Table(name = "foto_kegiatan")
 public class FotoKegiatan extends DateConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

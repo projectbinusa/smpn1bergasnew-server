@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface VisiMisiRepository extends JpaRepository<VisiMisi ,Long> {
-    @Query(value = "SELECT * FROM visi_misi ORDER BY update_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM visi_misi ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<VisiMisi> getAll(Pageable pageable);
 }
