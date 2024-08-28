@@ -44,6 +44,7 @@ public class TenagaKependidikanService {
         TenagaKependidikan update = tenagaKependidikanRepository.findById(id).orElse(null);
         update.setStatus(tenagaKependidikan.getStatus());
         update.setNama(tenagaKependidikan.getNama());
+        update.setJabatan(tenagaKependidikan.getJabatan());
         String image = uploadFile(multipartFile);
         update.setFoto(image);
         return tenagaKependidikanRepository.save(update);

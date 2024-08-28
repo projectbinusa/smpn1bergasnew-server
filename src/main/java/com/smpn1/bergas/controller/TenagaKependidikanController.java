@@ -1,7 +1,6 @@
 package com.smpn1.bergas.controller;
 
-import com.smpn1.bergas.model.Alumni;
-import com.smpn1.bergas.model.Guru;
+
 import com.smpn1.bergas.model.TenagaKependidikan;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.TenagaKependidikanService;

@@ -17,9 +17,22 @@ public class TenagaKependidikan extends DateConfig {
     @Column(name = "status")
     private String status;
 
+
+    @Column(name = "jabatan")
+    private String jabatan;
     @Lob
     @Column(name = "foto")
     private String foto;
+
+    public String getJabatan() {
+        return jabatan;
+    }
+
+    public void setJabatan(String jabatan) {
+        this.jabatan = jabatan;
+    }
+
+  
 
 
     public Long getId() {
