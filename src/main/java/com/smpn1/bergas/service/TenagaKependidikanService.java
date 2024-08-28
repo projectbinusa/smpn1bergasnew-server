@@ -32,6 +32,7 @@ public class TenagaKependidikanService {
         TenagaKependidikan update = tenagaKependidikanRepository.findById(id).orElse(null);
         update.setStatus(tenagaKependidikan.getStatus());
         update.setNama(tenagaKependidikan.getNama());
+        update.setJabatan(tenagaKependidikan.getJabatan());
         return tenagaKependidikanRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {
