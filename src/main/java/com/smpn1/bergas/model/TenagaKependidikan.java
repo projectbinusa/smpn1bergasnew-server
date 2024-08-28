@@ -17,8 +17,12 @@ public class TenagaKependidikan extends DateConfig {
     @Column(name = "status")
     private String status;
 
+
     @Column(name = "jabatan")
     private String jabatan;
+    @Lob
+    @Column(name = "foto")
+    private String foto;
 
     public String getJabatan() {
         return jabatan;
@@ -27,6 +31,9 @@ public class TenagaKependidikan extends DateConfig {
     public void setJabatan(String jabatan) {
         this.jabatan = jabatan;
     }
+
+  
+
 
     public Long getId() {
         return id;
@@ -50,5 +57,13 @@ public class TenagaKependidikan extends DateConfig {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getFoto() {
+        return foto;
+    }
+
+    public void setFoto(String foto) {
+        this.foto = foto;
     }
 }
