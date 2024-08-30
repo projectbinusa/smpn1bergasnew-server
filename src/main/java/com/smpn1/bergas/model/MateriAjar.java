@@ -22,9 +22,9 @@ public class MateriAjar extends DateConfig {
     @Column(name = "judul")
     private String judul;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "Asia/Jakarta")
-    @Column(name = "tgl_upload")
-    private Date tglUpload;
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "Asia/Jakarta")
+//    @Column(name = "tgl_upload")
+//    private Date tglUpload;
 
     @Column(name = "jenis")
     private String jenis;
@@ -68,13 +68,13 @@ public class MateriAjar extends DateConfig {
         this.judul = judul;
     }
 
-    public Date getTglUpload() {
-        return tglUpload;
-    }
-
-    public void setTglUpload(Date tglUpload) {
-        this.tglUpload = tglUpload;
-    }
+//    public Date getTglUpload() {
+//        return tglUpload;
+//    }
+//
+//    public void setTglUpload(Date tglUpload) {
+//        this.tglUpload = tglUpload;
+//    }
 
     public String getJenis() {
         return jenis;
