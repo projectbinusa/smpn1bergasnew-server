@@ -16,7 +16,7 @@ public class Prestasi extends DateConfig {
     @Column(name = "judul")
     private String judul;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" , timezone = "Asia/Jakarta")
+//    @JsonFormat(pattern = "yyyy-MM-dd" , timezone = "Asia/Jakarta")
     @Column(name = "tanggal")
     private Date tanggal;
 
