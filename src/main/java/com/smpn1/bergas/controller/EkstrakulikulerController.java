@@ -112,7 +112,7 @@ public class EkstrakulikulerController {
         }
     }
     @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Ekstrakurikuler>> updateEkstrakurikuler(@PathVariable("id") Long id, Ekstrakurikuler ekstrakurikuler , MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Ekstrakurikuler>> updateEkstrakurikuler(@PathVariable("id") Long id, Ekstrakurikuler ekstrakurikuler ,@RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
         CommonResponse<Ekstrakurikuler> response = new CommonResponse<>();
         try {
             Ekstrakurikuler tabelDip = ekstrakurikulerService.edit(ekstrakurikuler, id, multipartFile);
