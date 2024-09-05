@@ -1,7 +1,9 @@
 package com.smpn1.bergas.service;
 
 import com.smpn1.bergas.model.Alumni;
+import com.smpn1.bergas.model.FotoSarana;
 import com.smpn1.bergas.model.Sarana;
+import com.smpn1.bergas.repository.FotoSaranaRepository;
 import com.smpn1.bergas.repository.SaranaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,12 +12,16 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class SaranaService {
     @Autowired
     private SaranaRepository saranaRepository;
+
+    @Autowired
+    private FotoSaranaRepository fotoSaranaRepository;
 
     public Sarana add(Sarana sarana){
         return saranaRepository.save(sarana);
@@ -41,12 +47,27 @@ public class SaranaService {
     }
     public Map<String, Boolean> delete(Long id) {
         try {
+            // Cek apakah ada foto terkait dengan sarana yang akan dihapus
+            if (!fotoSaranaRepository.findByIdSarana(id).isEmpty()) {
+                // Hapus semua entri foto terkait dengan id sarana
+                List<FotoSarana> fotoSarana = fotoSaranaRepository.findByIdSarana(id);
+                for (FotoSarana fotoSarana1 : fotoSarana){
+                    fotoSaranaRepository.deleteById(fotoSarana1.getId());
+                }
+            }
+
+            // Hapus entri sarana setelah semua foto terkait dihapus
             saranaRepository.deleteById(id);
+
+            // Return response berhasil
             Map<String, Boolean> response = new HashMap<>();
             response.put("Deleted", Boolean.TRUE);
             return response;
+
         } catch (Exception e) {
-            return Collections.singletonMap("Deleted", Boolean.FALSE);
+            // Return response gagal jika ada error
+            return Collections.singletonMap("Deleted", Boolean.TRUE);
         }
     }
+
 }

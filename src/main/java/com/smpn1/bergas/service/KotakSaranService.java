@@ -1,5 +1,6 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.DTO.KotakSaranDTO;
 import com.smpn1.bergas.model.KotakSaran;
 import com.smpn1.bergas.repository.KotakSaranRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +17,13 @@ public class KotakSaranService {
     @Autowired
     private KotakSaranRepository kotakSaranRepository;
 
-    public KotakSaran add(KotakSaran kotakSaran){
-        return kotakSaranRepository.save(kotakSaran);
+    public KotakSaran add(KotakSaranDTO kotakSaran){
+        KotakSaran kotakSaran1 = new KotakSaran();
+        kotakSaran1.setTelp(kotakSaran.getTlp());
+        kotakSaran1.setPesan(kotakSaran.getPesan());
+        kotakSaran1.setNama(kotakSaran.getNama());
+        kotakSaran1.setEmail(kotakSaran.getEmail());
+        return kotakSaranRepository.save(kotakSaran1);
     }
     public KotakSaran getById(Long id){
         return kotakSaranRepository.findById(id).orElse(null);

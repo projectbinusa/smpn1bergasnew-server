@@ -1,5 +1,6 @@
 package com.smpn1.bergas.controller;
 
+import com.smpn1.bergas.DTO.KotakSaranDTO;
 import com.smpn1.bergas.model.KotakSaran;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.KotakSaranService;
@@ -21,8 +22,9 @@ public class KotakSaranController {
     @Autowired
     private KotakSaranService kotakSaranService;
 
+
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<KotakSaran>> add(@RequestBody KotakSaran kotakSaran) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<KotakSaran>> add(@RequestBody KotakSaranDTO kotakSaran) throws SQLException, ClassNotFoundException {
         CommonResponse<KotakSaran> response = new CommonResponse<>();
         try {
             KotakSaran kotakSaran1 = kotakSaranService.add(kotakSaran);
