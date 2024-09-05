@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.FotoKegiatan;
+import com.smpn1.bergas.model.Kegiatan;
+import com.smpn1.bergas.repository.FotoKegiatanRepository;
 import com.smpn1.bergas.model.FotoSarana;
 import com.smpn1.bergas.model.Kegiatan;
 import com.smpn1.bergas.repository.FotoKegiatanRepository;
-import com.smpn1.bergas.repository.FotoSaranaRepository;
 import com.smpn1.bergas.repository.KegiatanRepository;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -40,6 +41,9 @@ public class KegiatanService {
     private FotoKegiatanRepository fotoKegiatanRepository;
     @Autowired
     private KegiatanRepository kegiatanRepository;
+
+    @Autowired
+    private FotoKegiatanRepository fotoKegiatanRepository;
     private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
@@ -69,19 +73,13 @@ public class KegiatanService {
 
     public Map<String, Boolean> delete(Long id) {
         try {
-            // Cek apakah ada foto terkait dengan sarana yang akan dihapus
-            if (!fotoKegiatanRepository.findByIdKegiatan(id).isEmpty()) {
-                // Hapus semua entri foto terkait dengan id sarana
-                List<FotoKegiatan> fotoKegiatan = fotoKegiatanRepository.findByIdKegiatan(id);
-                for (FotoKegiatan fotoKegiatan1 : fotoKegiatan){
-                    fotoKegiatanRepository.deleteById(fotoKegiatan1.getId());
+            if (!fotoKegiatanRepository.findByIdKegiatan(id).isEmpty()){
+                List<FotoKegiatan> fotoKegiatans = fotoKegiatanRepository.findByIdKegiatan(id);
+                for (FotoKegiatan fotoKegiatan : fotoKegiatans){
+                    fotoKegiatanRepository.deleteById(fotoKegiatan.getId());
                 }
             }
-
-            // Hapus entri sarana setelah semua foto terkait dihapus
-            fotoKegiatanRepository.deleteById(id);
-
-            // Return response berhasil
+            kegiatanRepository.deleteById(id);
             Map<String, Boolean> response = new HashMap<>();
             response.put("Deleted", Boolean.TRUE);
             return response;
