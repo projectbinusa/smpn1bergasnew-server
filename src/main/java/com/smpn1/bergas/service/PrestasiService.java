@@ -60,7 +60,6 @@ public class PrestasiService {
         update.setSkala(prestasi.getSkala());
         update.setNama_peserta(prestasi.getNama_peserta());
         update.setTanggal(prestasi.getTanggal());
-        update.setJuara(prestasi.getJuara());
         return prestasiRepository.save(prestasi);
     }
     public Prestasi getByid(Long id){

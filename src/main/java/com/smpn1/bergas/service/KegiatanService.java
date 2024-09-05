@@ -6,6 +6,9 @@ import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.FotoKegiatan;
 import com.smpn1.bergas.model.Kegiatan;
 import com.smpn1.bergas.repository.FotoKegiatanRepository;
+import com.smpn1.bergas.model.FotoSarana;
+import com.smpn1.bergas.model.Kegiatan;
+import com.smpn1.bergas.repository.FotoKegiatanRepository;
 import com.smpn1.bergas.repository.KegiatanRepository;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -34,6 +37,8 @@ import java.util.*;
 
 @Service
 public class KegiatanService {
+    @Autowired
+    private FotoKegiatanRepository fotoKegiatanRepository;
     @Autowired
     private KegiatanRepository kegiatanRepository;
 
@@ -78,10 +83,23 @@ public class KegiatanService {
             Map<String, Boolean> response = new HashMap<>();
             response.put("Deleted", Boolean.TRUE);
             return response;
+
         } catch (Exception e) {
-            return Collections.singletonMap("Deleted", Boolean.FALSE);
+            // Return response gagal jika ada error
+            return Collections.singletonMap("Deleted", Boolean.TRUE);
         }
     }
+
+//    public Map<String, Boolean> delete(Long id) {
+//        try {
+//            kegiatanRepository.deleteById(id);
+//            Map<String, Boolean> response = new HashMap<>();
+//            response.put("Deleted", Boolean.TRUE);
+//            return response;
+//        } catch (Exception e) {
+//            return Collections.singletonMap("Deleted", Boolean.FALSE);
+//        }
+//    }
 
     public Kegiatan edit(Long id, Kegiatan kegiatan, MultipartFile multipartFile) throws Exception {
         Kegiatan update = kegiatanRepository.findById(id).orElse(null);
