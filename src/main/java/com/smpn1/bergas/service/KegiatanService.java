@@ -3,7 +3,9 @@ package com.smpn1.bergas.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.model.Alumni;
+import com.smpn1.bergas.model.FotoKegiatan;
 import com.smpn1.bergas.model.Kegiatan;
+import com.smpn1.bergas.repository.FotoKegiatanRepository;
 import com.smpn1.bergas.repository.KegiatanRepository;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -28,15 +30,15 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class KegiatanService {
     @Autowired
     private KegiatanRepository kegiatanRepository;
+
+    @Autowired
+    private FotoKegiatanRepository fotoKegiatanRepository;
     private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
@@ -66,6 +68,12 @@ public class KegiatanService {
 
     public Map<String, Boolean> delete(Long id) {
         try {
+            if (!fotoKegiatanRepository.findByIdKegiatan(id).isEmpty()){
+                List<FotoKegiatan> fotoKegiatans = fotoKegiatanRepository.findByIdKegiatan(id);
+                for (FotoKegiatan fotoKegiatan : fotoKegiatans){
+                    fotoKegiatanRepository.deleteById(fotoKegiatan.getId());
+                }
+            }
             kegiatanRepository.deleteById(id);
             Map<String, Boolean> response = new HashMap<>();
             response.put("Deleted", Boolean.TRUE);
