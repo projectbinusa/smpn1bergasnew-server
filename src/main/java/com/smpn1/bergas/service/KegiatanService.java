@@ -3,7 +3,11 @@ package com.smpn1.bergas.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.model.Alumni;
+import com.smpn1.bergas.model.FotoKegiatan;
+import com.smpn1.bergas.model.FotoSarana;
 import com.smpn1.bergas.model.Kegiatan;
+import com.smpn1.bergas.repository.FotoKegiatanRepository;
+import com.smpn1.bergas.repository.FotoSaranaRepository;
 import com.smpn1.bergas.repository.KegiatanRepository;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -28,13 +32,12 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class KegiatanService {
+    @Autowired
+    private FotoKegiatanRepository fotoKegiatanRepository;
     @Autowired
     private KegiatanRepository kegiatanRepository;
     private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
@@ -66,14 +69,39 @@ public class KegiatanService {
 
     public Map<String, Boolean> delete(Long id) {
         try {
-            kegiatanRepository.deleteById(id);
+            // Cek apakah ada foto terkait dengan sarana yang akan dihapus
+            if (!fotoKegiatanRepository.findByIdKegiatan(id).isEmpty()) {
+                // Hapus semua entri foto terkait dengan id sarana
+                List<FotoKegiatan> fotoKegiatan = fotoKegiatanRepository.findByIdKegiatan(id);
+                for (FotoKegiatan fotoKegiatan1 : fotoKegiatan){
+                    fotoKegiatanRepository.deleteById(fotoKegiatan1.getId());
+                }
+            }
+
+            // Hapus entri sarana setelah semua foto terkait dihapus
+            fotoKegiatanRepository.deleteById(id);
+
+            // Return response berhasil
             Map<String, Boolean> response = new HashMap<>();
             response.put("Deleted", Boolean.TRUE);
             return response;
+
         } catch (Exception e) {
-            return Collections.singletonMap("Deleted", Boolean.FALSE);
+            // Return response gagal jika ada error
+            return Collections.singletonMap("Deleted", Boolean.TRUE);
         }
     }
+
+//    public Map<String, Boolean> delete(Long id) {
+//        try {
+//            kegiatanRepository.deleteById(id);
+//            Map<String, Boolean> response = new HashMap<>();
+//            response.put("Deleted", Boolean.TRUE);
+//            return response;
+//        } catch (Exception e) {
+//            return Collections.singletonMap("Deleted", Boolean.FALSE);
+//        }
+//    }
 
     public Kegiatan edit(Long id, Kegiatan kegiatan, MultipartFile multipartFile) throws Exception {
         Kegiatan update = kegiatanRepository.findById(id).orElse(null);
