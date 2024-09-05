@@ -38,8 +38,6 @@ import java.util.*;
 @Service
 public class KegiatanService {
     @Autowired
-    private FotoKegiatanRepository fotoKegiatanRepository;
-    @Autowired
     private KegiatanRepository kegiatanRepository;
 
     @Autowired
