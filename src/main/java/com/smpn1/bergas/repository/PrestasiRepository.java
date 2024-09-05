@@ -9,4 +9,5 @@ import org.springframework.data.jpa.repository.Query;
 public interface PrestasiRepository extends JpaRepository<Prestasi , Long> {
     @Query(value = "SELECT * FROM prestasi ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Prestasi> getAll(Pageable pageable);
+
 }

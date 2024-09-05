@@ -16,13 +16,9 @@ public class Prestasi extends DateConfig {
     @Column(name = "judul")
     private String judul;
 
-//    @JsonFormat(pattern = "yyyy-MM-dd" , timezone = "Asia/Jakarta")
+    @JsonFormat(pattern = "yyyy-MM-dd" , timezone = "Asia/Jakarta")
     @Column(name = "tanggal")
     private Date tanggal;
-
-
-    @Column(name = "juara")
-    private String juara;
 
     @Column(name = "skala")
     private String skala;
@@ -36,14 +32,6 @@ public class Prestasi extends DateConfig {
     @Lob
     @Column(name = "foto")
     private String foto;
-
-    public String getJuara() {
-        return juara;
-    }
-
-    public void setJuara(String juara) {
-        this.juara = juara;
-    }
 
     public Long getId() {
         return id;
