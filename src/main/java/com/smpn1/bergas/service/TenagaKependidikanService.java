@@ -40,11 +40,15 @@ public class TenagaKependidikanService {
     public Page<TenagaKependidikan> getAllTerbaru(Pageable pageable) {
         return tenagaKependidikanRepository.getAll(pageable);
     }
-    public TenagaKependidikan edit(TenagaKependidikan tenagaKependidikan , MultipartFile multipartFile , Long id) throws Exception {
+    public TenagaKependidikan edit(TenagaKependidikan tenagaKependidikan, Long id) throws Exception {
         TenagaKependidikan update = tenagaKependidikanRepository.findById(id).orElse(null);
         update.setStatus(tenagaKependidikan.getStatus());
         update.setNama(tenagaKependidikan.getNama());
         update.setJabatan(tenagaKependidikan.getJabatan());
+        return tenagaKependidikanRepository.save(update);
+    }
+    public TenagaKependidikan editFoto( MultipartFile multipartFile , Long id) throws Exception {
+        TenagaKependidikan update = tenagaKependidikanRepository.findById(id).orElse(null);
         String image = uploadFile(multipartFile);
         update.setFoto(image);
         return tenagaKependidikanRepository.save(update);

@@ -109,11 +109,29 @@ public class GuruController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Guru>> updateGuru(@PathVariable("id") Long id, Guru prestasi,  @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+    @PutMapping(path = "/put/{id}")
+    public ResponseEntity<CommonResponse<Guru>> updateGuru(@PathVariable("id") Long id, @RequestBody Guru prestasi) throws SQLException, ClassNotFoundException {
         CommonResponse<Guru> response = new CommonResponse<>();
         try {
-            Guru tabelDip = guruService.edit(prestasi, multipartFile, id);
+            Guru tabelDip = guruService.edit(prestasi, id);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(tabelDip);
+            response.setMessage("Guru updated successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to update guru : " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<Guru>> updateGuru(@PathVariable("id") Long id, @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+        CommonResponse<Guru> response = new CommonResponse<>();
+        try {
+            Guru tabelDip = guruService.editFoto( multipartFile, id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(tabelDip);

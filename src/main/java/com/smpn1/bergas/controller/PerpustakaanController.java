@@ -107,11 +107,29 @@ public class PerpustakaanController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Perpustakaan>> updatePerpustakaan(@PathVariable("id") Long id, Perpustakaan perpustakaan,  @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+    @PutMapping(path = "/put/{id}")
+    public ResponseEntity<CommonResponse<Perpustakaan>> updatePerpustakaan(@PathVariable("id") Long id,@RequestBody Perpustakaan perpustakaan) throws SQLException, ClassNotFoundException {
         CommonResponse<Perpustakaan> response = new CommonResponse<>();
         try {
-            Perpustakaan tabelDip = perpustakaanService.edit(perpustakaan, multipartFile, id);
+            Perpustakaan tabelDip = perpustakaanService.edit(perpustakaan, id);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(tabelDip);
+            response.setMessage("Perpustakaan updated successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to update perpustakaan : " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping(path = "/put/foto/{id}")
+    public ResponseEntity<CommonResponse<Perpustakaan>> updatePerpustakaan(@PathVariable("id") Long id, @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+        CommonResponse<Perpustakaan> response = new CommonResponse<>();
+        try {
+            Perpustakaan tabelDip = perpustakaanService.editFoto( multipartFile, id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(tabelDip);

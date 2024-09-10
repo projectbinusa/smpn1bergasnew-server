@@ -112,10 +112,28 @@ public class EkstrakulikulerController {
         }
     }
     @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Ekstrakurikuler>> updateEkstrakurikuler(@PathVariable("id") Long id, Ekstrakurikuler ekstrakurikuler ,@RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Ekstrakurikuler>> updateEkstrakurikuler(@PathVariable("id") Long id, @RequestBody Ekstrakurikuler ekstrakurikuler) throws SQLException, ClassNotFoundException {
         CommonResponse<Ekstrakurikuler> response = new CommonResponse<>();
         try {
-            Ekstrakurikuler tabelDip = ekstrakurikulerService.edit(ekstrakurikuler, id, multipartFile);
+            Ekstrakurikuler tabelDip = ekstrakurikulerService.edit(ekstrakurikuler, id);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(tabelDip);
+            response.setMessage("Ekstrakurikuler updated successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to update ekstrakurikuler : " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<Ekstrakurikuler>> updateFoto(@PathVariable("id") Long id,@RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+        CommonResponse<Ekstrakurikuler> response = new CommonResponse<>();
+        try {
+            Ekstrakurikuler tabelDip = ekstrakurikulerService.editFoto( id, multipartFile);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(tabelDip);

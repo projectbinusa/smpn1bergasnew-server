@@ -44,16 +44,20 @@ public class PerpustakaanService {
         perpustakaan.setFoto(foto);
         return perpustakaanRepository.save(perpustakaan);
     }
-    public Perpustakaan edit(Perpustakaan perpustakaan , MultipartFile multipartFile , Long id) throws Exception {
+    public Perpustakaan edit(Perpustakaan perpustakaan, Long id) throws Exception {
         Perpustakaan update = perpustakaanRepository.findById(id).orElse(null);
-        String foto = uploadFile(multipartFile);
-        update.setFoto(foto);
         update.setNo(perpustakaan.getNo());
         update.setPengarang(perpustakaan.getPengarang());
         update.setSinopsis(perpustakaan.getSinopsis());
         update.setNama_buku(perpustakaan.getNama_buku());
         update.setTahun(perpustakaan.getTahun());
-        return perpustakaanRepository.save(perpustakaan);
+        return perpustakaanRepository.save(update);
+    }
+    public Perpustakaan editFoto( MultipartFile multipartFile , Long id) throws Exception {
+        Perpustakaan update = perpustakaanRepository.findById(id).orElse(null);
+        String foto = uploadFile(multipartFile);
+        update.setFoto(foto);
+        return perpustakaanRepository.save(update);
     }
     public Perpustakaan getByid(Long id){
         return perpustakaanRepository.findById(id).orElse(null);

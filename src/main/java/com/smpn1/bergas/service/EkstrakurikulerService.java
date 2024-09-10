@@ -57,8 +57,7 @@ public class EkstrakurikulerService {
     public Page<Ekstrakurikuler> getAllTerbaru(Pageable pageable) {
         return ekstrakurikulerRepository.getAll(pageable);
     }
-    public Ekstrakurikuler edit(Ekstrakurikuler ekstrakurikuler , Long id , MultipartFile multipartFile) throws Exception {
-        String image = uploadFile(multipartFile);
+    public Ekstrakurikuler edit(Ekstrakurikuler ekstrakurikuler , Long id) throws Exception {
         Ekstrakurikuler update = ekstrakurikulerRepository.findById(id).orElse(null);
         update.setName(ekstrakurikuler.getName());
         update.setDeskripsi(ekstrakurikuler.getDeskripsi());
@@ -67,6 +66,11 @@ public class EkstrakurikulerService {
         update.setPembimbing(ekstrakurikuler.getPembimbing());
         update.setTempat(ekstrakurikuler.getTempat());
         update.setPrestasi(ekstrakurikuler.getPrestasi());
+        return ekstrakurikulerRepository.save(update);
+    }
+    public Ekstrakurikuler editFoto(Long id , MultipartFile multipartFile) throws Exception {
+        String image = uploadFile(multipartFile);
+        Ekstrakurikuler update = ekstrakurikulerRepository.findById(id).orElse(null);
         update.setFoto(image);
         return ekstrakurikulerRepository.save(update);
     }

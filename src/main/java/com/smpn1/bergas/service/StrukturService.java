@@ -74,15 +74,19 @@ public class StrukturService {
         }
     }
 
-    public Struktur edit(Long id, StrukturDTO strukturDTO, MultipartFile multipartFile) throws Exception {
+    public Struktur edit(Long id, StrukturDTO strukturDTO) throws Exception {
         Struktur struktur = strukturRepository.findById(id).orElse(null);
-        String image = uploadFile(multipartFile);
         struktur.setNama(strukturDTO.getNama());
         struktur.setJabatan(strukturDTO.getJabatan());
-        struktur.setFoto(image);
         struktur.setTugas(strukturDTO.getTugas());
         struktur.setJenisStruktur(strukturDTO.getJenis());
 
+        return strukturRepository.save(struktur);
+    }
+    public Struktur editFoto(Long id,MultipartFile multipartFile) throws Exception {
+        Struktur struktur = strukturRepository.findById(id).orElse(null);
+        String image = uploadFile(multipartFile);
+        struktur.setFoto(image);
         return strukturRepository.save(struktur);
     }
 

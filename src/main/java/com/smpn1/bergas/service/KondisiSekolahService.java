@@ -46,12 +46,16 @@ public class KondisiSekolahService {
         kondisiSekolah.setFoto(foto);
         return kondisiSekolahRepository.save(kondisiSekolah);
     }
-    public KondisiSekolah edit(KondisiSekolah kondisiSekolah , MultipartFile multipartFile , Long id) throws Exception {
+    public KondisiSekolah edit(KondisiSekolah kondisiSekolah, Long id) throws Exception {
+        KondisiSekolah update = kondisiSekolahRepository.findById(id).orElse(null);
+        update.setDeskripsi(kondisiSekolah.getDeskripsi());
+        return kondisiSekolahRepository.save(update);
+    }
+    public KondisiSekolah editFoto(MultipartFile multipartFile , Long id) throws Exception {
         KondisiSekolah update = kondisiSekolahRepository.findById(id).orElse(null);
         String foto = uploadFile(multipartFile);
         update.setFoto(foto);
-        update.setDeskripsi(kondisiSekolah.getDeskripsi());
-        return kondisiSekolahRepository.save(kondisiSekolah);
+        return kondisiSekolahRepository.save(update);
     }
     public KondisiSekolah getByid(Long id){
         return kondisiSekolahRepository.findById(id).orElse(null);

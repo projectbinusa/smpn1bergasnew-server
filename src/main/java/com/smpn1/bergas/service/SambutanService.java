@@ -52,14 +52,18 @@ public class SambutanService {
     public Page<Sambutan> getAllTerbaru(Pageable pageable) {
         return sambutanRepository.getAll(pageable);
     }
-    public Sambutan edit(Sambutan sambutan , MultipartFile multipartFile , Long id) throws Exception {
+    public Sambutan edit(Sambutan sambutan  , Long id) throws Exception {
         Sambutan update = sambutanRepository.findById(id).orElse(null);
-        String image = uploadFile(multipartFile);
-        update.setFoto(image);
         update.setNama(sambutan.getNama());
         update.setIsi(sambutan.getIsi());
         update.setNip(sambutan.getNip());
         update.setJudul(sambutan.getJudul());
+        return sambutanRepository.save(update);
+    }
+    public Sambutan editFoto( MultipartFile multipartFile , Long id) throws Exception {
+        Sambutan update = sambutanRepository.findById(id).orElse(null);
+        String image = uploadFile(multipartFile);
+        update.setFoto(image);
         return sambutanRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {

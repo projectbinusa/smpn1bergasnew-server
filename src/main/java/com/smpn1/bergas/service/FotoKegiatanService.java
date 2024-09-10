@@ -66,9 +66,13 @@ public class FotoKegiatanService {
     public Page<FotoKegiatan> getAllByKegiatan(Long id ,Pageable pageable){
         return fotoKegiatanRepository.findByKegiatanId(id,pageable);
     }
-    public FotoKegiatan edit(FotoKegiatanDTO fotoKegiatan , MultipartFile multipartFile , Long id) throws Exception {
+    public FotoKegiatan edit(FotoKegiatanDTO fotoKegiatan , Long id) throws Exception {
         FotoKegiatan update = fotoKegiatanRepository.findById(id).orElse(null);
         update.setKegiatan(kegiatanRepository.findById(fotoKegiatan.getId_kegiatan()).orElse(null));
+        return fotoKegiatanRepository.save(update);
+    }
+    public FotoKegiatan editFoto( MultipartFile multipartFile , Long id) throws Exception {
+        FotoKegiatan update = fotoKegiatanRepository.findById(id).orElse(null);
         String image = uploadFile(multipartFile);
         update.setFoto(image);
         return fotoKegiatanRepository.save(update);

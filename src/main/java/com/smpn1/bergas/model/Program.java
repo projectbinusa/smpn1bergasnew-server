@@ -19,6 +19,10 @@ public class Program extends DateConfig {
     @Column(name = "tujuan")
     private String tujuan;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_id")
+    private CategoryProgram categoryProgram;
+
     public Long getId() {
         return id;
     }
@@ -49,5 +53,13 @@ public class Program extends DateConfig {
 
     public void setTujuan(String tujuan) {
         this.tujuan = tujuan;
+    }
+
+    public CategoryProgram getCategoryProgram() {
+        return categoryProgram;
+    }
+
+    public void setCategoryProgram(CategoryProgram categoryProgram) {
+        this.categoryProgram = categoryProgram;
     }
 }

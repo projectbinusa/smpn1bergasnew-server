@@ -51,17 +51,21 @@ public class PrestasiService {
         prestasi.setTanggal(prestasi.getTanggal());
         return prestasiRepository.save(prestasi);
     }
-    public Prestasi edit(Prestasi prestasi , MultipartFile multipartFile , Long id) throws Exception {
+    public Prestasi edit(Prestasi prestasi, Long id) throws Exception {
         Prestasi update = prestasiRepository.findById(id).orElse(null);
-        String foto = uploadFile(multipartFile);
-        update.setFoto(foto);
         update.setJudul(prestasi.getJudul());
         update.setPeyelenggara(prestasi.getPeyelenggara());
         update.setSkala(prestasi.getSkala());
         update.setNama_peserta(prestasi.getNama_peserta());
         update.setTanggal(prestasi.getTanggal());
         update.setJuara(prestasi.getJuara());
-        return prestasiRepository.save(prestasi);
+        return prestasiRepository.save(update);
+    }
+    public Prestasi editFoto(MultipartFile multipartFile , Long id) throws Exception {
+        Prestasi update = prestasiRepository.findById(id).orElse(null);
+        String foto = uploadFile(multipartFile);
+        update.setFoto(foto);
+        return prestasiRepository.save(update);
     }
     public Prestasi getByid(Long id){
         return prestasiRepository.findById(id).orElse(null);

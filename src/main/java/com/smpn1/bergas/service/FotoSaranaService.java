@@ -64,9 +64,13 @@ public class FotoSaranaService {
     public Page<FotoSarana> getAllBySarana(Long id ,Pageable pageable){
         return fotoSaranaRepository.findBySaranaId(id,pageable);
     }
-    public FotoSarana edit(FotoSaranaDTO fotoSarana , MultipartFile multipartFile , Long id) throws Exception {
+    public FotoSarana edit(FotoSaranaDTO fotoSarana, Long id) throws Exception {
         FotoSarana update = fotoSaranaRepository.findById(id).orElse(null);
         update.setSarana(saranaRepository.findById(fotoSarana.getId_sarana()).orElse(null));
+        return fotoSaranaRepository.save(update);
+    }
+    public FotoSarana editFoto( MultipartFile multipartFile , Long id) throws Exception {
+        FotoSarana update = fotoSaranaRepository.findById(id).orElse(null);
         String image = uploadFile(multipartFile);
         update.setFoto(image);
         return fotoSaranaRepository.save(update);

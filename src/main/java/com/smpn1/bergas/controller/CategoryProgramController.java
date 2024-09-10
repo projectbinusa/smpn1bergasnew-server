@@ -1,10 +1,8 @@
 package com.smpn1.bergas.controller;
 
-
-import com.smpn1.bergas.DTO.ProgramDTO;
-import com.smpn1.bergas.model.Program;
+import com.smpn1.bergas.model.CategoryProgram;
 import com.smpn1.bergas.response.CommonResponse;
-import com.smpn1.bergas.service.ProgramService;
+import com.smpn1.bergas.service.CategoryProgramService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,45 +15,45 @@ import java.sql.SQLException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/smpn1bergas/api/program")
+@RequestMapping("/smpn1bergas/api/category_program")
 @CrossOrigin(origins = "*")
-public class ProgramController {
+public class CategoryProgramController {
     @Autowired
-    private ProgramService programService;
+    private CategoryProgramService categoryprogramService;
 
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Program>> add(@RequestBody ProgramDTO program) throws SQLException, ClassNotFoundException {
-        CommonResponse<Program> response = new CommonResponse<>();
+    public ResponseEntity<CommonResponse<CategoryProgram>> add(@RequestBody CategoryProgram categoryprogram) throws SQLException, ClassNotFoundException {
+        CommonResponse<CategoryProgram> response = new CommonResponse<>();
         try {
-            Program program1 = programService.add(program);
+            CategoryProgram categoryprogram1 = categoryprogramService.add(categoryprogram);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
-            response.setData(program1);
-            response.setMessage("Program created successfully.");
+            response.setData(categoryprogram1);
+            response.setMessage("Visi Misi created successfully.");
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
-            response.setMessage("Failed to create program: " + e.getMessage());
+            response.setMessage("Failed to create Visi Misi: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @GetMapping(path = "/all")
-    public ResponseEntity<CommonResponse<Page<Program>>> listAllProgram(
+    public ResponseEntity<CommonResponse<Page<CategoryProgram>>> listAllCategoryProgram(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        CommonResponse<Page<Program>> response = new CommonResponse<>();
+        CommonResponse<Page<CategoryProgram>> response = new CommonResponse<>();
         try {
-            Page<Program> beritaPage = programService.getAll(pageable);
+            Page<CategoryProgram> beritaPage = categoryprogramService.getAll(pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
-            response.setMessage(" Program list retrieved successfully.");
+            response.setMessage(" CategoryProgram list retrieved successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setStatus("error");
@@ -66,20 +64,20 @@ public class ProgramController {
         }
     }
     @GetMapping(path = "/all/terbaru")
-    public ResponseEntity<CommonResponse<Page<Program>>> listAllProgramTerbaru(
+    public ResponseEntity<CommonResponse<Page<CategoryProgram>>> listAllCategoryProgramTerbaru(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        CommonResponse<Page<Program>> response = new CommonResponse<>();
+        CommonResponse<Page<CategoryProgram>> response = new CommonResponse<>();
         try {
-            Page<Program> beritaPage = programService.getAllTerbaru(pageable);
+            Page<CategoryProgram> beritaPage = categoryprogramService.getAllTerbaru(pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
-            response.setMessage(" Program list retrieved successfully.");
+            response.setMessage(" CategoryProgram list retrieved successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setStatus("error");
@@ -90,68 +88,43 @@ public class ProgramController {
         }
     }
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public ResponseEntity<CommonResponse<Program>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
-        CommonResponse<Program> response = new CommonResponse<>();
+    public ResponseEntity<CommonResponse<CategoryProgram>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
+        CommonResponse<CategoryProgram> response = new CommonResponse<>();
         try {
-            Program categoryBerita = programService.getById(id);
+            CategoryProgram categoryBerita = categoryprogramService.getById(id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(categoryBerita);
-            response.setMessage("Program get successfully.");
+            response.setMessage("CategoryProgram get successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
-            response.setMessage("Failed to get program: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    @GetMapping(path = "/get/judul")
-    public ResponseEntity<CommonResponse<Page<Program>>> getByJudul(
-            @RequestParam(name = "judul_program") String judul,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
-
-        Pageable pageable = PageRequest.of(page, size);
-
-        CommonResponse<Page<Program>> response = new CommonResponse<>();
-        try {
-            Page<Program> beritaPage = programService.getByJudul(judul, pageable);
-            response.setStatus("success");
-            response.setCode(HttpStatus.OK.value());
-            response.setData(beritaPage);
-            response.setMessage(" Program list retrieved successfully.");
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.setStatus("error");
-            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setData(null);
-            response.setMessage("Failed to retrieve keuangan list: " + e.getMessage());
+            response.setMessage("Failed to get alumni: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @PutMapping(path = "/put/{id}", produces = "application/json")
-    public ResponseEntity<CommonResponse<Program>> updateProgram(@PathVariable("id") Long id, @RequestBody ProgramDTO program) throws SQLException, ClassNotFoundException {
-        CommonResponse<Program> response = new CommonResponse<>();
+    public ResponseEntity<CommonResponse<CategoryProgram>> updateCategoryProgram(@PathVariable("id") Long id, @RequestBody CategoryProgram categoryprogram) throws SQLException, ClassNotFoundException {
+        CommonResponse<CategoryProgram> response = new CommonResponse<>();
         try {
-            Program tabelDip = programService.edit(program, id);
+            CategoryProgram tabelDip = categoryprogramService.edit(categoryprogram, id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(tabelDip);
-            response.setMessage("Program updated successfully.");
+            response.setMessage("Tabel Visi Misi updated successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
-            response.setMessage("Failed to update program : " + e.getMessage());
+            response.setMessage("Failed to update Visi Misi : " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> delete(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(programService.delete(id));
+        return ResponseEntity.ok(categoryprogramService.delete(id));
     }
 }

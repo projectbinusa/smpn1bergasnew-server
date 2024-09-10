@@ -1,7 +1,9 @@
 package com.smpn1.bergas.service;
 
+import com.smpn1.bergas.DTO.ProgramDTO;
 import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Program;
+import com.smpn1.bergas.repository.CategoryProgramRepository;
 import com.smpn1.bergas.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,7 +19,15 @@ public class ProgramService {
     @Autowired
     private ProgramRepository programRepository;
 
-    public Program add(Program program){
+    @Autowired
+    private CategoryProgramRepository categoryProgramRepository;
+
+    public Program add(ProgramDTO programDTO){
+        Program program = new Program();
+        program.setCategoryProgram(categoryProgramRepository.findById(programDTO.getId_category()).orElse( null));
+        program.setJudulProgram(programDTO.getJudul());
+        program.setNamaProgram(programDTO.getNama());
+        program.setTujuan(programDTO.getTujuan());
         return programRepository.save(program);
     }
     public Program getById(Long id){
@@ -32,11 +42,12 @@ public class ProgramService {
     public Page<Program> getByJudul(String judul , Pageable pageable){
         return programRepository.getByJudul(judul, pageable);
     }
-    public Program edit(Program program ,Long id){
+    public Program edit(ProgramDTO program ,Long id){
         Program update = programRepository.findById(id).orElse(null);
-        update.setJudulProgram(program.getJudulProgram());
-        update.setNamaProgram(program.getNamaProgram());
+        update.setJudulProgram(program.getJudul());
+        update.setNamaProgram(program.getNama());
         update.setTujuan(program.getTujuan());
+        update.setCategoryProgram(categoryProgramRepository.findById(program.getId_category()).orElse( null));
         return programRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {

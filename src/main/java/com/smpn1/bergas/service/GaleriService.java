@@ -54,10 +54,14 @@ public class GaleriService {
     public Page<Galeri> getAllTerbaru(Pageable pageable) {
         return galeriRepository.getAll(pageable);
     }
-    public Galeri edit(Galeri galeri , MultipartFile multipartFile , Long id) throws Exception {
+    public Galeri edit(Galeri galeri, Long id) throws Exception {
         Galeri update = galeriRepository.findById(id).orElse(null);
         update.setJudul(galeri.getJudul());
         update.setDeskripsi(galeri.getDeskripsi());
+        return galeriRepository.save(update);
+    }
+    public Galeri editFoto( MultipartFile multipartFile , Long id) throws Exception {
+        Galeri update = galeriRepository.findById(id).orElse(null);
         String image = uploadFile(multipartFile);
         update.setFoto(image);
         return galeriRepository.save(update);
