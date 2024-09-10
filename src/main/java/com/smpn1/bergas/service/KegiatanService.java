@@ -38,8 +38,6 @@ import java.util.*;
 @Service
 public class KegiatanService {
     @Autowired
-    private FotoKegiatanRepository fotoKegiatanRepository;
-    @Autowired
     private KegiatanRepository kegiatanRepository;
 
     private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
