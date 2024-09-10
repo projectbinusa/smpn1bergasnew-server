@@ -58,7 +58,6 @@ public class PrestasiService {
         update.setSkala(prestasi.getSkala());
         update.setNama_peserta(prestasi.getNama_peserta());
         update.setTanggal(prestasi.getTanggal());
-        update.setJuara(prestasi.getJuara());
         return prestasiRepository.save(update);
     }
     public Prestasi editFoto(MultipartFile multipartFile , Long id) throws Exception {

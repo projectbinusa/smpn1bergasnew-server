@@ -47,7 +47,7 @@ public class StrukturService {
         newStruktur.setJabatan(struktur.getJabatan());
         newStruktur.setFoto(image);
         newStruktur.setTugas(struktur.getTugas());
-        newStruktur.setJenisStruktur(struktur.getJenis());
+//        newStruktur.setJenisStruktur(struktur.getJenis());
 
         return strukturRepository.save(newStruktur);
     }
@@ -79,7 +79,7 @@ public class StrukturService {
         struktur.setNama(strukturDTO.getNama());
         struktur.setJabatan(strukturDTO.getJabatan());
         struktur.setTugas(strukturDTO.getTugas());
-        struktur.setJenisStruktur(strukturDTO.getJenis());
+//        struktur.setJenisStruktur(strukturDTO.getJenis());
 
         return strukturRepository.save(struktur);
     }

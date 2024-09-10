@@ -24,8 +24,8 @@ public class Struktur extends DateConfig {
     @Column(name = "foto_anggota")
     private String foto;
 
-    @Column(name = "jenis")
-    private String jenisStruktur;
+//    @Column(name = "jenis")
+//    private String jenisStruktur;
 
     public Long getId() {
         return id;
@@ -67,11 +67,11 @@ public class Struktur extends DateConfig {
         this.foto = foto;
     }
 
-    public String getJenisStruktur() {
-        return jenisStruktur;
-    }
-
-    public void setJenisStruktur(String jenisStruktur) {
-        this.jenisStruktur = jenisStruktur;
-    }
+//    public String getJenisStruktur() {
+//        return jenisStruktur;
+//    }
+//
+//    public void setJenisStruktur(String jenisStruktur) {
+//        this.jenisStruktur = jenisStruktur;
+//    }
 }

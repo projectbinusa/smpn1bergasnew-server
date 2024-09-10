@@ -53,7 +53,7 @@ public class MateriAjarService {
             update.setJudul(materiAjar.getJudul());
             update.setPenyusun(materiAjar.getPenyusun());
             update.setTingkat(materiAjar.getTingkat());
-            update.setTglUpload(materiAjar.getTglUpload());
+//            update.setTglUpload(materiAjar.getTglUpload());
             return materiAjarRepository.save(update);
         }
         return null;

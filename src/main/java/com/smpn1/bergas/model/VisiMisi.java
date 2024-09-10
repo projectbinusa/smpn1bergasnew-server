@@ -11,12 +11,15 @@ public class VisiMisi extends DateConfig {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Lob
     @Column(name = "visi")
     private String visi;
 
+    @Lob
     @Column(name = "misi")
     private String misi;
 
+    @Lob
     @Column(name = "tujuan")
     private String tujuan;
 
