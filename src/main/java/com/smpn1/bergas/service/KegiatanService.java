@@ -40,6 +40,9 @@ public class KegiatanService {
     @Autowired
     private KegiatanRepository kegiatanRepository;
 
+    @Autowired
+    private FotoKegiatanRepository fotoKegiatanRepository;
+
     private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
