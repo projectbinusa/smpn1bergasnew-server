@@ -43,16 +43,23 @@ public class OsisService {
         return osisRepository.getAll(pageable);
     }
 
-    public Osis edit(Osis osis, MultipartFile multipartFile, Long id) throws Exception {
+    public Osis edit(Osis osis, Long id) throws Exception {
         Osis update = osisRepository.findById(id).orElse(null);
         if (update != null) {
-            String image = uploadFIle(multipartFile);
             update.setJabatan(osis.getJabatan());
             update.setNama(osis.getNama());
-            update.setFoto(image);
             update.setKelas(osis.getKelas());
             update.setTahunJabat(osis.getTahunJabat());
             update.setTahunTuntas(osis.getTahunTuntas());
+            return osisRepository.save(update);
+        }
+        return null;
+    }
+    public Osis editFoto( MultipartFile multipartFile, Long id) throws Exception {
+        Osis update = osisRepository.findById(id).orElse(null);
+        if (update != null) {
+            String image = uploadFIle(multipartFile);
+            update.setFoto(image);
             return osisRepository.save(update);
         }
         return null;

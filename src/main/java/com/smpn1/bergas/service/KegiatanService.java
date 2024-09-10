@@ -40,8 +40,6 @@ public class KegiatanService {
     @Autowired
     private KegiatanRepository kegiatanRepository;
 
-    @Autowired
-    private FotoKegiatanRepository fotoKegiatanRepository;
     private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
@@ -99,15 +97,19 @@ public class KegiatanService {
 //        }
 //    }
 
-    public Kegiatan edit(Long id, Kegiatan kegiatan, MultipartFile multipartFile) throws Exception {
+    public Kegiatan edit(Long id, Kegiatan kegiatan) throws Exception {
         Kegiatan update = kegiatanRepository.findById(id).orElse(null);
-        String image = uploadFile(multipartFile);
         update.setJudul(kegiatan.getJudul());
         update.setIsi(kegiatan.getIsi());
         update.setPenulis(kegiatan.getPenulis());
         update.setTanggal(kegiatan.getTanggal());
+        return kegiatanRepository.save(update);
+    }
+    public Kegiatan editFoto(Long id, MultipartFile multipartFile) throws Exception {
+        Kegiatan update = kegiatanRepository.findById(id).orElse(null);
+        String image = uploadFile(multipartFile);
         update.setFoto(image);
-        return kegiatanRepository.save(kegiatan);
+        return kegiatanRepository.save(update);
     }
 
     private String extractFileUrlFromResponse(String responseBody) throws IOException {

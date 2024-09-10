@@ -77,8 +77,8 @@ public class BeritaController {
     }
 
 //    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Berita>> updateBerita(@PathVariable("id") Long id, BeritaDTO berita, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PutMapping(path = "/put/{id}")
+    public ResponseEntity<CommonResponse<Berita>> updateBerita(@PathVariable("id") Long id, @RequestBody BeritaDTO berita) throws SQLException, ClassNotFoundException {
         CommonResponse<Berita> response = new CommonResponse<>();
         try {
             Optional<Berita> currentBerita = beritaService.findById(id);
@@ -93,7 +93,37 @@ public class BeritaController {
 
             // Update berita here...
 
-            Berita berita1 = beritaService.update(id, berita, multipartFile);
+            Berita berita1 = beritaService.update(id, berita);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(berita1);
+            response.setMessage("Berita updated successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to update berita: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+ @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<Berita>> updateFoto(@PathVariable("id") Long id, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+        CommonResponse<Berita> response = new CommonResponse<>();
+        try {
+            Optional<Berita> currentBerita = beritaService.findById(id);
+
+            if (!currentBerita.isPresent()) {
+                response.setStatus("error");
+                response.setCode(HttpStatus.NOT_FOUND.value());
+                response.setData(null);
+                response.setMessage("Berita with id " + id + " not found.");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+
+            // Update berita here...
+
+            Berita berita1 = beritaService.updateFoto(id, multipartFile);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(berita1);

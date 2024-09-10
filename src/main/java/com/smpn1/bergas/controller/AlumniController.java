@@ -113,11 +113,29 @@ public class AlumniController {
     }
 
     //    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Alumni>> updateAlumni(@PathVariable("id") Long id, Alumni prestasi, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PutMapping(path = "/put/{id}")
+    public ResponseEntity<CommonResponse<Alumni>> updateAlumni(@PathVariable("id") Long id, @RequestBody Alumni prestasi) throws SQLException, ClassNotFoundException {
         CommonResponse<Alumni> response = new CommonResponse<>();
         try {
-            Alumni tabelDip = alumniService.edit(prestasi, multipartFile, id);
+            Alumni tabelDip = alumniService.edit(prestasi, id);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(tabelDip);
+            response.setMessage("Alumni updated successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to update alumni : " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<Alumni>> updateFoto(@PathVariable("id") Long id, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+        CommonResponse<Alumni> response = new CommonResponse<>();
+        try {
+            Alumni tabelDip = alumniService.editFoto( multipartFile, id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(tabelDip);

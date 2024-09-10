@@ -56,18 +56,25 @@ public class AlumniService {
         return alumniRepository.getAll(pageable);
     }
 
-    public Alumni edit(Alumni alumni, MultipartFile multipartFile, Long id) throws Exception {
+    public Alumni edit(Alumni alumni, Long id) throws Exception {
         Alumni update = alumniRepository.findById(id).orElse(null);
         if (update != null) {
-            String image = uploadFIle(multipartFile);
             update.setBiografi(alumni.getBiografi());
             update.setNama(alumni.getNama());
-            update.setFoto(image);
             update.setKontak(alumni.getKontak());
             update.setProfesi(alumni.getProfesi());
             update.setTahunLulus(alumni.getTahunLulus());
 //            update.setNip(alumni.getNip());
 //            update.setRiwayat(alumni.getRiwayat());
+            return alumniRepository.save(update);
+        }
+        return null;
+    }
+    public Alumni editFoto(MultipartFile multipartFile, Long id) throws Exception {
+        Alumni update = alumniRepository.findById(id).orElse(null);
+        if (update != null) {
+            String image = uploadFIle(multipartFile);
+            update.setFoto(image);
             return alumniRepository.save(update);
         }
         return null;

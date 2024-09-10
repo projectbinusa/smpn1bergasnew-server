@@ -76,14 +76,18 @@ public class KeuanganService {
         }
     }
 
-    public Keuangan edit(Long id, KeuanganDTO keuanganDTO, MultipartFile multipartFile) throws Exception {
+    public Keuangan edit(Long id, KeuanganDTO keuanganDTO) throws Exception {
         Keuangan keuangan = keuanganRepository.findById(id).orElse(null);
-        String image = uploadFile(multipartFile);
         keuangan.setJudul(keuanganDTO.getJudul());
         keuangan.setIsi(keuanganDTO.getIsi());
-        keuangan.setFotoJudul(image);
         keuangan.setCategoryKeuangan(keuanganDTO.getCategory());
 
+        return keuanganRepository.save(keuangan);
+    }
+    public Keuangan editFoto(Long id, MultipartFile multipartFile) throws Exception {
+        Keuangan keuangan = keuanganRepository.findById(id).orElse(null);
+        String image = uploadFile(multipartFile);
+        keuangan.setFotoJudul(image);
         return keuanganRepository.save(keuangan);
     }
 

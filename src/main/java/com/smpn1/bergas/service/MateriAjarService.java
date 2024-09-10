@@ -45,17 +45,24 @@ public class MateriAjarService {
         return materiAjarRepository.getAll(pageable);
     }
 
-    public MateriAjar edit(MateriAjar materiAjar, MultipartFile multipartFile, Long id) throws Exception {
+    public MateriAjar edit(MateriAjar materiAjar, Long id) throws Exception {
         MateriAjar update = materiAjarRepository.findById(id).orElse(null);
         if (update != null) {
-            String file = uploadFIle(multipartFile);
             update.setJenis(materiAjar.getJenis());
             update.setMapel(materiAjar.getMapel());
-            update.setIsi(file);
             update.setJudul(materiAjar.getJudul());
             update.setPenyusun(materiAjar.getPenyusun());
             update.setTingkat(materiAjar.getTingkat());
 //            update.setTglUpload(materiAjar.getTglUpload());
+            return materiAjarRepository.save(update);
+        }
+        return null;
+    }
+    public MateriAjar editFile( MultipartFile multipartFile, Long id) throws Exception {
+        MateriAjar update = materiAjarRepository.findById(id).orElse(null);
+        if (update != null) {
+            String file = uploadFIle(multipartFile);
+            update.setIsi(file);
             return materiAjarRepository.save(update);
         }
         return null;

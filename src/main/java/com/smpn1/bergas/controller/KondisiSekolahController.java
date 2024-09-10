@@ -107,11 +107,29 @@ public class KondisiSekolahController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<KondisiSekolah>> updateKondisiSekolah(@PathVariable("id") Long id, KondisiSekolah kondisiSekolah,  @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+    @PutMapping(path = "/put/{id}")
+    public ResponseEntity<CommonResponse<KondisiSekolah>> updateKondisiSekolah(@PathVariable("id") Long id,@RequestBody KondisiSekolah kondisiSekolah) throws SQLException, ClassNotFoundException {
         CommonResponse<KondisiSekolah> response = new CommonResponse<>();
         try {
-            KondisiSekolah tabelDip = kondisiSekolahService.edit(kondisiSekolah, multipartFile, id);
+            KondisiSekolah tabelDip = kondisiSekolahService.edit(kondisiSekolah,  id);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(tabelDip);
+            response.setMessage("Kondisi sekolah updated successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to update kondisi sekolah : " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<KondisiSekolah>> updateKondisiSekolah(@PathVariable("id") Long id,  @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+        CommonResponse<KondisiSekolah> response = new CommonResponse<>();
+        try {
+            KondisiSekolah tabelDip = kondisiSekolahService.editFoto( multipartFile, id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(tabelDip);

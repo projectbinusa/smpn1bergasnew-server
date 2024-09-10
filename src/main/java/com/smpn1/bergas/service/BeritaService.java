@@ -85,14 +85,18 @@ public class BeritaService {
         }
     }
 
-    public Berita update(Long id, BeritaDTO beritaDTO, MultipartFile multipartFile) throws Exception {
+    public Berita update(Long id, BeritaDTO beritaDTO) throws Exception {
         Berita berita = beritaDao.findById(id);
-        String image = uploadFile(multipartFile);
         berita.setJudulBerita(beritaDTO.getJudulBerita());
         berita.setIsiBerita(beritaDTO.getIsiBerita());
         berita.setAuthor(beritaDTO.getAuthor());
-        berita.setImage(image);
         berita.setCategoryBerita(beritaDTO.getCategory());
+        return beritaDao.save(berita);
+    }
+    public Berita updateFoto(Long id, MultipartFile multipartFile) throws Exception {
+        Berita berita = beritaDao.findById(id);
+        String image = uploadFile(multipartFile);
+        berita.setImage(image);
         return beritaDao.save(berita);
     }
 

@@ -54,14 +54,18 @@ public class GuruService {
     public Page<Guru> getAllTerbaru(Pageable pageable) {
         return guruRepository.getAll(pageable);
     }
-    public Guru edit(Guru guru , MultipartFile multipartFile , Long id) throws Exception {
+    public Guru edit(Guru guru, Long id) throws Exception {
         Guru update = guruRepository.findById(id).orElse(null);
         update.setMapel(guru.getMapel());
         update.setNama_guru(guru.getNama_guru());
-        String image = uploadFile(multipartFile);
-        update.setFoto(image);
         update.setNip(guru.getNip());
         update.setRiwayat(guru.getRiwayat());
+        return guruRepository.save(update);
+    }
+    public Guru editFoto( MultipartFile multipartFile , Long id) throws Exception {
+        Guru update = guruRepository.findById(id).orElse(null);
+        String image = uploadFile(multipartFile);
+        update.setFoto(image);
         return guruRepository.save(update);
     }
 

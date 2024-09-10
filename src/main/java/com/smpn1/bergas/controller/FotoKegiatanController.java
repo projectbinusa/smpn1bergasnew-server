@@ -134,11 +134,29 @@ public class FotoKegiatanController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<FotoKegiatan>> updateFotoKegiatan(@PathVariable("id") Long id, FotoKegiatanDTO fotoKegiatan, @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+    @PutMapping(path = "/put/{id}")
+    public ResponseEntity<CommonResponse<FotoKegiatan>> updateFotoKegiatan(@PathVariable("id") Long id, @RequestBody FotoKegiatanDTO fotoKegiatan) throws SQLException, ClassNotFoundException {
         CommonResponse<FotoKegiatan> response = new CommonResponse<>();
         try {
-            FotoKegiatan fotoKegiatan1 = fotoKegiatanService.edit(fotoKegiatan, multipartFile, id);
+            FotoKegiatan fotoKegiatan1 = fotoKegiatanService.edit(fotoKegiatan, id);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(fotoKegiatan1);
+            response.setMessage("FotoKegiatan updated successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to update fotoKegiatan : " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<FotoKegiatan>> updateFotoKegiatan(@PathVariable("id") Long id, @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+        CommonResponse<FotoKegiatan> response = new CommonResponse<>();
+        try {
+            FotoKegiatan fotoKegiatan1 = fotoKegiatanService.editFoto( multipartFile, id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(fotoKegiatan1);
