@@ -26,11 +26,11 @@ public class StrukturController {
     @Autowired
     private StrukturService strukturService;
 
-    @PostMapping(path = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Struktur>> add(StrukturDTO struktur, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add")
+    public ResponseEntity<CommonResponse<Struktur>> add(@RequestBody StrukturDTO struktur) throws SQLException, ClassNotFoundException {
         CommonResponse<Struktur> response = new CommonResponse<>();
         try {
-            Struktur struktur1 = strukturService.add(struktur, multipartFile);
+            Struktur struktur1 = strukturService.add(struktur);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(struktur1);

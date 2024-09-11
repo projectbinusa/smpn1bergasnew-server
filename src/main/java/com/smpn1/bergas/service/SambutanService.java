@@ -38,9 +38,7 @@ public class SambutanService {
     private SambutanRepository sambutanRepository;
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-a0910.appspot.com/o/%s?alt=media";
 
-    public Sambutan add(Sambutan sambutan , MultipartFile multipartFile) throws Exception {
-        String image = uploadFile(multipartFile);
-        sambutan.setFoto(image);
+    public Sambutan add(Sambutan sambutan ) throws Exception {
         return sambutanRepository.save(sambutan);
     }
     public Sambutan getById(Long id){

@@ -25,11 +25,11 @@ public class GuruController {
     @Autowired
     private GuruService guruService;
 
-    @PostMapping(path = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Guru>> add(Guru prestasi, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add")
+    public ResponseEntity<CommonResponse<Guru>> add(@RequestBody Guru prestasi) throws SQLException, ClassNotFoundException {
         CommonResponse<Guru> response = new CommonResponse<>();
         try {
-            Guru prestasi1 = guruService.add(prestasi, multipartFile);
+            Guru prestasi1 = guruService.add(prestasi);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(prestasi1);

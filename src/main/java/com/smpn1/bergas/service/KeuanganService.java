@@ -43,12 +43,10 @@ public class KeuanganService {
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
 
-    public Keuangan add(KeuanganDTO keuangan, MultipartFile multipartFile) throws Exception {
+    public Keuangan add(KeuanganDTO keuangan) throws Exception {
         Keuangan newKeuangan = new Keuangan();
-        String image = uploadFile(multipartFile);
         newKeuangan.setJudul(keuangan.getJudul());
         newKeuangan.setIsi(keuangan.getIsi());
-        newKeuangan.setFotoJudul(image);
         newKeuangan.setCategoryKeuangan(keuangan.getCategory());
 
         return keuanganRepository.save(newKeuangan);

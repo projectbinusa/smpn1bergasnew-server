@@ -26,9 +26,7 @@ public class TenagaKependidikanService {
     @Autowired
     private TenagaKependidikanRepository tenagaKependidikanRepository;
 
-    public TenagaKependidikan add(TenagaKependidikan tenagaKependidikan , MultipartFile multipartFile) throws Exception {
-        String image = uploadFile(multipartFile);
-        tenagaKependidikan.setFoto(image);
+    public TenagaKependidikan add(TenagaKependidikan tenagaKependidikan ) throws Exception {
         return tenagaKependidikanRepository.save(tenagaKependidikan);
     }
     public TenagaKependidikan getById(Long id){

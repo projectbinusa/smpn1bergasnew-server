@@ -26,9 +26,7 @@ public class OsisService {
     @Autowired
     private OsisRepository osisRepository;
 
-    public Osis add(Osis osis, MultipartFile multipartFile) throws Exception {
-        String image = uploadFIle(multipartFile);
-        osis.setFoto(image);
+    public Osis add(Osis osis) throws Exception {
         return osisRepository.save(osis);
     }
 

@@ -24,11 +24,11 @@ public class EkstrakulikulerController {
     @Autowired
     private EkstrakurikulerService ekstrakurikulerService;
 
-    @PostMapping(path = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Ekstrakurikuler>> add(Ekstrakurikuler ekstrakurikuler ,@RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add")
+    public ResponseEntity<CommonResponse<Ekstrakurikuler>> add(@RequestBody Ekstrakurikuler ekstrakurikuler ) throws SQLException, ClassNotFoundException {
         CommonResponse<Ekstrakurikuler> response = new CommonResponse<>();
         try {
-            Ekstrakurikuler ekstrakurikuler1 = ekstrakurikulerService.add(ekstrakurikuler , multipartFile);
+            Ekstrakurikuler ekstrakurikuler1 = ekstrakurikulerService.add(ekstrakurikuler );
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(ekstrakurikuler1);
