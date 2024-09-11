@@ -22,11 +22,11 @@ import java.util.Map;
 public class TenagaKependidikanController {
     @Autowired
     private TenagaKependidikanService tenagaKependidikanService;
-    @PostMapping(path = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<TenagaKependidikan>> add(TenagaKependidikan tenaga, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add")
+    public ResponseEntity<CommonResponse<TenagaKependidikan>> add(@RequestBody TenagaKependidikan tenaga) throws SQLException, ClassNotFoundException {
         CommonResponse<TenagaKependidikan> response = new CommonResponse<>();
         try {
-            TenagaKependidikan tenaga1 = tenagaKependidikanService.add(tenaga, multipartFile);
+            TenagaKependidikan tenaga1 = tenagaKependidikanService.add(tenaga);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(tenaga1);

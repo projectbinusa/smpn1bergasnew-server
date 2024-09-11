@@ -25,11 +25,11 @@ public class KegiatanController {
     private KegiatanService kegiatanService;
 
 
-    @PostMapping(path = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Kegiatan>> add(Kegiatan kegiatan, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add")
+    public ResponseEntity<CommonResponse<Kegiatan>> add(@RequestBody Kegiatan kegiatan) throws SQLException, ClassNotFoundException {
         CommonResponse<Kegiatan> response = new CommonResponse<>();
         try {
-            Kegiatan prestasi1 = kegiatanService.add(kegiatan, multipartFile);
+            Kegiatan prestasi1 = kegiatanService.add(kegiatan);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(prestasi1);

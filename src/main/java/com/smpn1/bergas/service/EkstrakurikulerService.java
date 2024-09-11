@@ -43,9 +43,7 @@ public class EkstrakurikulerService {
 //    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
 
 
-    public Ekstrakurikuler add(Ekstrakurikuler ekstrakurikuler , MultipartFile multipartFile) throws Exception {
-        String image = uploadFile(multipartFile);
-        ekstrakurikuler.setFoto(image);
+    public Ekstrakurikuler add(Ekstrakurikuler ekstrakurikuler) throws Exception {
         return ekstrakurikulerRepository.save(ekstrakurikuler);
     }
     public Ekstrakurikuler getById(Long id){

@@ -25,11 +25,11 @@ public class SambutanController {
     @Autowired
     private SambutanService sambutanService;
 
-    @PostMapping(path = "/add",  consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Sambutan>> add(Sambutan sambutan ,@RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add")
+    public ResponseEntity<CommonResponse<Sambutan>> add(@RequestBody Sambutan sambutan ) throws SQLException, ClassNotFoundException {
         CommonResponse<Sambutan> response = new CommonResponse<>();
         try {
-            Sambutan sambutan1 = sambutanService.add(sambutan , multipartFile);
+            Sambutan sambutan1 = sambutanService.add(sambutan );
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(sambutan1);

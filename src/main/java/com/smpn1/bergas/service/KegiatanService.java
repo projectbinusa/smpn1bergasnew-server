@@ -47,9 +47,7 @@ public class KegiatanService {
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
 
-    public Kegiatan add(Kegiatan kegiatan, MultipartFile multipartFile) throws Exception {
-        String image = uploadFile(multipartFile);
-        kegiatan.setFoto(image);
+    public Kegiatan add(Kegiatan kegiatan) throws Exception {
         return kegiatanRepository.save(kegiatan);
     }
 

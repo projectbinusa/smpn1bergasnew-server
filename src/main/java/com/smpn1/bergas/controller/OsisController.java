@@ -23,11 +23,11 @@ public class OsisController {
     private OsisService osisService;
 
 
-    @PostMapping(path = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Osis>> add(Osis osis, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add")
+    public ResponseEntity<CommonResponse<Osis>> add(@RequestBody Osis osis) throws SQLException, ClassNotFoundException {
         CommonResponse<Osis> response = new CommonResponse<>();
         try {
-            Osis prestasi1 = osisService.add(osis, multipartFile);
+            Osis prestasi1 = osisService.add(osis);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(prestasi1);

@@ -26,11 +26,11 @@ public class KeuanganController {
     private KeuanganService keuanganService;
 
 
-    @PostMapping(path = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Keuangan>> add(KeuanganDTO keuangan, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add")
+    public ResponseEntity<CommonResponse<Keuangan>> add(@RequestBody KeuanganDTO keuangan) throws SQLException, ClassNotFoundException {
         CommonResponse<Keuangan> response = new CommonResponse<>();
         try {
-            Keuangan keuangan1 = keuanganService.add(keuangan, multipartFile);
+            Keuangan keuangan1 = keuanganService.add(keuangan);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(keuangan1);

@@ -40,9 +40,7 @@ public class GuruService {
     @Autowired
     private GuruRepository guruRepository;
 
-    public Guru add(Guru guru , MultipartFile multipartFile) throws Exception {
-        String image = uploadFile(multipartFile);
-        guru.setFoto(image);
+    public Guru add(Guru guru ) throws Exception {
         return guruRepository.save(guru);
     }
     public Guru getById(Long id){

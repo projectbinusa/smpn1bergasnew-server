@@ -40,12 +40,10 @@ public class StrukturService {
 
 
 
-    public Struktur add(StrukturDTO struktur, MultipartFile multipartFile) throws Exception {
+    public Struktur add(StrukturDTO struktur) throws Exception {
         Struktur newStruktur = new Struktur();
-        String image = uploadFile(multipartFile);
         newStruktur.setNama(struktur.getNama());
         newStruktur.setJabatan(struktur.getJabatan());
-        newStruktur.setFoto(image);
         newStruktur.setTugas(struktur.getTugas());
 //        newStruktur.setJenisStruktur(struktur.getJenis());
 
