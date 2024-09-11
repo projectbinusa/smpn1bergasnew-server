@@ -64,7 +64,7 @@ public class CategoryProgramController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @GetMapping(path = "/all")
+    @GetMapping(path = "/all/no_page")
     public ResponseEntity<CommonResponse<List<CategoryProgram>>> getAllCategoryProgram(
     ) {
 
