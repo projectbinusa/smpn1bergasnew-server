@@ -39,6 +39,9 @@ public class ProgramService {
     public Page<Program> getAllTerbaru(Pageable pageable) {
         return programRepository.getAll(pageable);
     }
+    public Page<Program> getAllByKategory(Long id ,Pageable pageable) {
+        return programRepository.findByIdCategory(id ,pageable);
+    }
     public Page<Program> getByJudul(String judul , Pageable pageable){
         return programRepository.getByJudul(judul, pageable);
     }

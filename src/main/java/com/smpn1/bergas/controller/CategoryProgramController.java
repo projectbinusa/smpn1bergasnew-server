@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -50,6 +51,26 @@ public class CategoryProgramController {
         CommonResponse<Page<CategoryProgram>> response = new CommonResponse<>();
         try {
             Page<CategoryProgram> beritaPage = categoryprogramService.getAll(pageable);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage(" CategoryProgram list retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve guru list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @GetMapping(path = "/all")
+    public ResponseEntity<CommonResponse<List<CategoryProgram>>> getAllCategoryProgram(
+    ) {
+
+        CommonResponse<List<CategoryProgram>> response = new CommonResponse<>();
+        try {
+            List<CategoryProgram> beritaPage = categoryprogramService.getAllNoPage();
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);

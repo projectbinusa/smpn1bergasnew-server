@@ -26,11 +26,11 @@ public class BeritaController {
     @Autowired
     private BeritaService beritaService;
 
-    @PostMapping(path = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Berita>> createberita2(BeritaDTO berita, @RequestPart("file")MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add")
+    public ResponseEntity<CommonResponse<Berita>> createberita2(BeritaDTO berita) throws SQLException, ClassNotFoundException {
         CommonResponse<Berita> response = new CommonResponse<>();
         try {
-            Berita berita1 = beritaService.save(berita, multipartFile);
+            Berita berita1 = beritaService.save(berita);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(berita1);

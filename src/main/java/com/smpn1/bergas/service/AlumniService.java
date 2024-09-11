@@ -39,9 +39,7 @@ public class AlumniService {
     @Autowired
     AlumniRepository alumniRepository;
 
-    public Alumni add(Alumni alumni, MultipartFile multipartFile) throws Exception {
-        String image = uploadFIle(multipartFile);
-        alumni.setFoto(image);
+    public Alumni add(Alumni alumni) throws Exception {
         return alumniRepository.save(alumni);
     }
 

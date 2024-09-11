@@ -65,6 +65,31 @@ public class ProgramController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @GetMapping(path = "/all/category")
+    public ResponseEntity<CommonResponse<Page<Program>>> listAllProgramByCategory(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(name = "id_category") Long id
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        CommonResponse<Page<Program>> response = new CommonResponse<>();
+        try {
+            Page<Program> beritaPage = programService.getAllByKategory(id,pageable);
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage(" Program list retrieved successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve guru list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<Program>>> listAllProgramTerbaru(
             @RequestParam(defaultValue = "0") int page,

@@ -24,11 +24,11 @@ public class AlumniController {
     @Autowired
     private AlumniService alumniService;
 
-    @PostMapping(path = "/add", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Alumni>> add(Alumni alumni, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add")
+    public ResponseEntity<CommonResponse<Alumni>> add(@RequestBody Alumni alumni) throws SQLException, ClassNotFoundException {
         CommonResponse<Alumni> response = new CommonResponse<>();
         try {
-            Alumni prestasi1 = alumniService.add(alumni, multipartFile);
+            Alumni prestasi1 = alumniService.add(alumni);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(prestasi1);
@@ -42,7 +42,6 @@ public class AlumniController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
     @GetMapping(path = "/all")
     public ResponseEntity<CommonResponse<Page<Alumni>>> listAllAlumni(
             @RequestParam(defaultValue = "0") int page,
