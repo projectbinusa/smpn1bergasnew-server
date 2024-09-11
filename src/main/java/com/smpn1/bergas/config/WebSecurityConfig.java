@@ -111,7 +111,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/smpn1bergas/api/category_program/all/**",
             "/smpn1bergas/api/category_program/get/**",
 
-
     };
 
     private static final String[] AUTH_AUTHORIZATION = {

@@ -4,9 +4,6 @@ public class ProgramDTO {
     private Long id_category;
 
     private String nama;
-
-    private String judul;
-
     private String tujuan;
 
     public Long getId_category() {
@@ -23,14 +20,6 @@ public class ProgramDTO {
 
     public void setNama(String nama) {
         this.nama = nama;
-    }
-
-    public String getJudul() {
-        return judul;
-    }
-
-    public void setJudul(String judul) {
-        this.judul = judul;
     }
 
     public String getTujuan() {

@@ -13,8 +13,8 @@ public class Program extends DateConfig {
     @Column(name = "nama_program")
     private String namaProgram;
 
-    @Column(name = "judul_program")
-    private String judulProgram;
+//    @Column(name = "judul_program")
+//    private String judulProgram;
 
     @Column(name = "tujuan")
     private String tujuan;
@@ -39,13 +39,13 @@ public class Program extends DateConfig {
         this.namaProgram = namaProgram;
     }
 
-    public String getJudulProgram() {
-        return judulProgram;
-    }
-
-    public void setJudulProgram(String judulProgram) {
-        this.judulProgram = judulProgram;
-    }
+//    public String getJudulProgram() {
+//        return judulProgram;
+//    }
+//
+//    public void setJudulProgram(String judulProgram) {
+//        this.judulProgram = judulProgram;
+//    }
 
     public String getTujuan() {
         return tujuan;

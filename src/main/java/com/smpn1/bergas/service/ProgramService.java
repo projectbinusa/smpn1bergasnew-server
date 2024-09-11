@@ -25,7 +25,7 @@ public class ProgramService {
     public Program add(ProgramDTO programDTO){
         Program program = new Program();
         program.setCategoryProgram(categoryProgramRepository.findById(programDTO.getId_category()).orElse( null));
-        program.setJudulProgram(programDTO.getJudul());
+//        program.setJudulProgram(programDTO.getJudul());
         program.setNamaProgram(programDTO.getNama());
         program.setTujuan(programDTO.getTujuan());
         return programRepository.save(program);
@@ -47,7 +47,7 @@ public class ProgramService {
     }
     public Program edit(ProgramDTO program ,Long id){
         Program update = programRepository.findById(id).orElse(null);
-        update.setJudulProgram(program.getJudul());
+//        update.setJudulProgram(program.getJudul());
         update.setNamaProgram(program.getNama());
         update.setTujuan(program.getTujuan());
         update.setCategoryProgram(categoryProgramRepository.findById(program.getId_category()).orElse( null));
