@@ -32,6 +32,9 @@ public class CategoryProgramService {
     public Page<CategoryProgram> getAll(Pageable pageable){
         return categoryProgramRepository.findAll(pageable);
     }
+    public List<CategoryProgram> getAllNoPage(){
+        return categoryProgramRepository.findAll();
+    }
     public Page<CategoryProgram> getAllTerbaru(Pageable pageable) {
         return categoryProgramRepository.getAll(pageable);
     }

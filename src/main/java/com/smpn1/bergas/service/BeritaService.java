@@ -52,13 +52,11 @@ public class BeritaService {
 
 //    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
 
-    public Berita save(BeritaDTO berita, MultipartFile multipartFile) throws Exception {
+    public Berita save(BeritaDTO berita) throws Exception {
         Berita newBerita = new Berita();
-        String image = uploadFile(multipartFile);
         newBerita.setAuthor(berita.getAuthor());
         newBerita.setJudulBerita(berita.getJudulBerita());
         newBerita.setIsiBerita(berita.getIsiBerita());
-        newBerita.setImage(image);
         newBerita.setCategoryBerita(berita.getCategory());
 
         return beritaDao.save(newBerita);

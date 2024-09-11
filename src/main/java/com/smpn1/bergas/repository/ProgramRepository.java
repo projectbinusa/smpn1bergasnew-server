@@ -18,4 +18,7 @@ public interface ProgramRepository extends JpaRepository<Program , Long> {
 
     @Query(value = "SELECT * FROM program WHERE category_id = :id" , nativeQuery = true)
     List<Program> findByIdCategory(Long id);
+
+    @Query(value = "SELECT * FROM program WHERE category_id = :id" , nativeQuery = true)
+    Page<Program> findByIdCategory(Long id , Pageable pageable);
 }
