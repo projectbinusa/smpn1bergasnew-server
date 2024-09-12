@@ -110,7 +110,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/smpn1bergas/api/osis/get/**",
             "/smpn1bergas/api/category_program/all/**",
             "/smpn1bergas/api/category_program/get/**",
-
+            "/smpn1bergas/api/category_program/all/terbaru/**",
+            "/smpn1bergas/api/program/all/terbaru/**",
     };
 
     private static final String[] AUTH_AUTHORIZATION = {
