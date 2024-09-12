@@ -111,7 +111,7 @@ public class EkstrakulikulerController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
+    @PutMapping(path = "/put/{id}")
     public ResponseEntity<CommonResponse<Ekstrakurikuler>> updateEkstrakurikuler(@PathVariable("id") Long id, @RequestBody Ekstrakurikuler ekstrakurikuler) throws SQLException, ClassNotFoundException {
         CommonResponse<Ekstrakurikuler> response = new CommonResponse<>();
         try {

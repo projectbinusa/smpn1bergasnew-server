@@ -159,7 +159,7 @@ public class KegiatanController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
+    @PutMapping(path = "/put/{id}")
     public ResponseEntity<CommonResponse<Kegiatan>> updateKegiatan(@PathVariable("id") Long id, @RequestBody Kegiatan prestasi ) throws SQLException, ClassNotFoundException {
         CommonResponse<Kegiatan> response = new CommonResponse<>();
         try {
