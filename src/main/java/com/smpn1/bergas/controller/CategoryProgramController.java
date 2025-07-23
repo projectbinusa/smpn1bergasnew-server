@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/smpn1bergas/api/category_program")
+@RequestMapping("/api/category_program")
 @CrossOrigin(origins = "*")
 public class CategoryProgramController {
     @Autowired

@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/smpn1bergas/api/foto_sarana")
+@RequestMapping("/api/foto_sarana")
 @CrossOrigin(origins = "*")
 public class FotoSaranaController {
     @Autowired

@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/smpn1bergas/api/galeri")
+@RequestMapping("/api/galeri")
 @CrossOrigin(origins = "*")
 public class GaleriController {
     @Autowired

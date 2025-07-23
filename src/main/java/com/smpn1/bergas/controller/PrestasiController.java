@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/smpn1bergas/api/prestasi")
+@RequestMapping("/api/prestasi")
 @CrossOrigin(origins = "*")
 public class PrestasiController {
     @Autowired

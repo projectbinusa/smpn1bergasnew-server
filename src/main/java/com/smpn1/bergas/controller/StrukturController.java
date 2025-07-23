@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/smpn1bergas/api/struktur")
+@RequestMapping("/api/struktur")
 @CrossOrigin(origins = "*")
 public class StrukturController {
     @Autowired

@@ -16,7 +16,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/smpn1bergas/api/osis")
+@RequestMapping("/api/osis")
 @CrossOrigin(origins = "*")
 public class OsisController {
     @Autowired
