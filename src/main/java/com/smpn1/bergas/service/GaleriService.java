@@ -29,9 +29,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class GaleriService {
@@ -39,12 +37,19 @@ public class GaleriService {
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
     @Autowired
     private GaleriRepository galeriRepository;
+    public Galeri add(Galeri galeri, MultipartFile[] files) throws Exception {
+        List<String> uploadedUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String url = uploadFile(file);
+            uploadedUrls.add(url);
+        }
 
-    public Galeri add(Galeri galeri , MultipartFile multipartFile) throws Exception {
-        String image = uploadFile(multipartFile);
-        galeri.setFoto(image);
+        ObjectMapper mapper = new ObjectMapper();
+        galeri.setFoto(mapper.writeValueAsString(uploadedUrls)); // simpan sebagai JSON string
+
         return galeriRepository.save(galeri);
     }
+
     public Galeri getById(Long id){
         return galeriRepository.findById(id).orElse(null);
     }
@@ -60,10 +65,19 @@ public class GaleriService {
         update.setDeskripsi(galeri.getDeskripsi());
         return galeriRepository.save(update);
     }
-    public Galeri editFoto( MultipartFile multipartFile , Long id) throws Exception {
+    public Galeri editFoto(MultipartFile[] files, Long id) throws Exception {
         Galeri update = galeriRepository.findById(id).orElse(null);
-        String image = uploadFile(multipartFile);
-        update.setFoto(image);
+        if (update == null) throw new Exception("Data tidak ditemukan");
+
+        List<String> uploadedUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String url = uploadFile(file);
+            uploadedUrls.add(url);
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        update.setFoto(mapper.writeValueAsString(uploadedUrls));
+
         return galeriRepository.save(update);
     }
 
