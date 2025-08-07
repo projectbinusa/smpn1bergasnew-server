@@ -1,38 +1,36 @@
 package com.smpn1.bergas.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.smpn1.bergas.model.Alumni;
-import com.smpn1.bergas.model.Galeri;
-import com.smpn1.bergas.repository.GaleriRepository;
-import com.google.auth.Credentials;
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smpn1.bergas.model.Galeri;
+import com.smpn1.bergas.repository.CategoryGaleryRepository;
+import com.smpn1.bergas.repository.GaleriRepository;
 
 @Service
 public class GaleriService {
+    @Autowired
+    private CategoryGaleryRepository categoryGaleryRepository;
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
     @Autowired
@@ -46,7 +44,15 @@ public class GaleriService {
 
         ObjectMapper mapper = new ObjectMapper();
         galeri.setFoto(mapper.writeValueAsString(uploadedUrls)); // simpan sebagai JSON string
+        Long categoryId = galeri.getCategoryGalery() != null ? galeri.getCategoryGalery().getId() : null;
+        if (categoryId == null) {
+            throw new IllegalArgumentException("Kategori galeri tidak boleh kosong.");
+        }
 
+        galeri.setCategoryGalery(
+            categoryGaleryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Kategori galeri tidak ditemukan."))
+        );
         return galeriRepository.save(galeri);
     }
 
@@ -63,6 +69,15 @@ public class GaleriService {
         Galeri update = galeriRepository.findById(id).orElse(null);
         update.setJudul(galeri.getJudul());
         update.setDeskripsi(galeri.getDeskripsi());
+        Long categoryId = galeri.getCategoryGalery() != null ? galeri.getCategoryGalery().getId() : null;
+        if (categoryId == null) {
+            throw new IllegalArgumentException("Kategori galeri tidak boleh kosong.");
+        }
+
+        update.setCategoryGalery(
+            categoryGaleryRepository.findById(categoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Kategori galeri tidak ditemukan."))
+        );
         return galeriRepository.save(update);
     }
     public Galeri editFoto(MultipartFile[] files, Long id) throws Exception {
