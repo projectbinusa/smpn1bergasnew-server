@@ -129,4 +129,30 @@ public class JenjangController {
     public ResponseEntity<Map<String, Boolean>> delete(@PathVariable("id") Long id) {
         return ResponseEntity.ok(jenjangService.delete(id));
     }
+
+    @GetMapping(path = "/get/by-link/{link}")
+    public ResponseEntity<CommonResponse<Jenjang>> getByLink(@PathVariable("link") String link) {
+        CommonResponse<Jenjang> response = new CommonResponse<>();
+        try {
+            Jenjang jenjang = jenjangService.getByLink(link);
+            if (jenjang != null) {
+                response.setStatus("success");
+                response.setCode(HttpStatus.OK.value());
+                response.setData(jenjang);
+                response.setMessage("Jenjang retrieved successfully.");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                response.setStatus("error");
+                response.setCode(HttpStatus.NOT_FOUND.value());
+                response.setMessage("Jenjang not found.");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setMessage("Failed to get jenjang: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

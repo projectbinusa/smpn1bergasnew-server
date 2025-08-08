@@ -112,7 +112,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "/api/category_program/get/**",
         "/api/category_program/all/terbaru/**",
         "/api/program/all/terbaru/**",
-        "/api/laporanbosp/**"
+        "/api/jenjang/all",
+        "/api/jenjang/get/by-link/{link}",
+        "/api/program/all/terbaru/**",
+        // "/api/laporanbosp/**"
     };
 
     private static final String[] AUTH_AUTHORIZATION = {

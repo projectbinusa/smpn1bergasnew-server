@@ -60,4 +60,8 @@ public class JenjangService {
             return Collections.singletonMap("Deleted", Boolean.FALSE);
         }
     }
+
+    public Jenjang getByLink(String link) {
+        return jenjangRepositoryRepository.findByLink(link);
+    }
 }

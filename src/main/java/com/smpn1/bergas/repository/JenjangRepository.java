@@ -9,4 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 public interface JenjangRepository extends JpaRepository<Jenjang, Long> {
     @Query(value = "SELECT * FROM jenjang ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Jenjang> getAll(Pageable pageable);
+
+    @Query(value = "SELECT * FROM jenjang WHERE link = :link LIMIT 1", nativeQuery = true)
+    Jenjang findByLink(String link);
 }
