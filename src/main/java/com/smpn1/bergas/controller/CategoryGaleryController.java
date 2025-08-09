@@ -2,6 +2,7 @@ package com.smpn1.bergas.controller;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,13 +31,13 @@ import com.smpn1.bergas.service.CategoryGaleryService;
 @CrossOrigin(origins = "*")
 public class CategoryGaleryController {
     @Autowired
-    private CategoryGaleryService categoryprogramService;
+    private CategoryGaleryService categoryGaleryService;
 
     @PostMapping(path = "/add")
     public ResponseEntity<CommonResponse<CategoryGalery>> add(@RequestBody CategoryGalery categoryprogram) throws SQLException, ClassNotFoundException {
         CommonResponse<CategoryGalery> response = new CommonResponse<>();
         try {
-            CategoryGalery categoryprogram1 = categoryprogramService.add(categoryprogram);
+            CategoryGalery categoryprogram1 = categoryGaleryService.add(categoryprogram);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(categoryprogram1);
@@ -59,7 +61,7 @@ public class CategoryGaleryController {
 
         CommonResponse<Page<CategoryGalery>> response = new CommonResponse<>();
         try {
-            Page<CategoryGalery> beritaPage = categoryprogramService.getAll(pageable);
+            Page<CategoryGalery> beritaPage = categoryGaleryService.getAll(pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
@@ -79,7 +81,7 @@ public class CategoryGaleryController {
 
         CommonResponse<List<CategoryGalery>> response = new CommonResponse<>();
         try {
-            List<CategoryGalery> beritaPage = categoryprogramService.getAllNoPage();
+            List<CategoryGalery> beritaPage = categoryGaleryService.getAllNoPage();
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
@@ -103,7 +105,7 @@ public class CategoryGaleryController {
 
         CommonResponse<Page<CategoryGalery>> response = new CommonResponse<>();
         try {
-            Page<CategoryGalery> beritaPage = categoryprogramService.getAllTerbaru(pageable);
+            Page<CategoryGalery> beritaPage = categoryGaleryService.getAllTerbaru(pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
@@ -121,7 +123,7 @@ public class CategoryGaleryController {
     public ResponseEntity<CommonResponse<CategoryGalery>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
         CommonResponse<CategoryGalery> response = new CommonResponse<>();
         try {
-            CategoryGalery categoryBerita = categoryprogramService.getById(id);
+            CategoryGalery categoryBerita = categoryGaleryService.getById(id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(categoryBerita);
@@ -139,7 +141,7 @@ public class CategoryGaleryController {
     public ResponseEntity<CommonResponse<CategoryGalery>> updateCategoryGalery(@PathVariable("id") Long id, @RequestBody CategoryGalery categoryprogram) throws SQLException, ClassNotFoundException {
         CommonResponse<CategoryGalery> response = new CommonResponse<>();
         try {
-            CategoryGalery tabelDip = categoryprogramService.edit(categoryprogram, id);
+            CategoryGalery tabelDip = categoryGaleryService.edit(categoryprogram, id);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(tabelDip);
@@ -153,8 +155,8 @@ public class CategoryGaleryController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    // @DeleteMapping("/{id}")
-    // public ResponseEntity<Map<String, Boolean>> delete(@PathVariable("id") Long id) {
-    //     return ResponseEntity.ok(categoryprogramService.delete(id));
-    // }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, Boolean>> delete(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(categoryGaleryService.delete(id));
+    }
 }

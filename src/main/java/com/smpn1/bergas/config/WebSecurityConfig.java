@@ -116,6 +116,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "/api/jenjang/get/{id}",
         "/api/jenjang/get/by-link/{link}",
         "/api/program/all/terbaru/**",
+        "/api/category_galery/all/**",
+        "/api/category_galery/get/**",
         // "/api/laporanbosp/**"
     };
 
