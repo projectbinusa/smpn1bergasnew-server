@@ -46,12 +46,19 @@ public class LaporanBospService {
 
     private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
 
-//    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
-    public LaporanBosp save(LaporanBospDTO dto) throws Exception {
+    //    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
+    public LaporanBosp save(LaporanBospDTO dto, MultipartFile[] multipartFiles) throws Exception {
         LaporanBosp laporan = new LaporanBosp();
         laporan.setNama(dto.getNama());
         laporan.setDeskripsi(dto.getDeskripsi());
-        laporan.setFiles(dto.getFiles()); // asumsi di entity `files` adalah String[]
+
+        if (multipartFiles != null && multipartFiles.length > 0) {
+            String[] fileUrls = new String[multipartFiles.length];
+            for (int i = 0; i < multipartFiles.length; i++) {
+                fileUrls[i] = uploadFile(multipartFiles[i]); // Upload ke S3
+            }
+            laporan.setFiles(fileUrls);
+        }
 
         return laporanRepo.save(laporan);
     }
@@ -74,20 +81,25 @@ public class LaporanBospService {
         }
     }
 
-    public LaporanBosp update(Long id, LaporanBospDTO dto) throws Exception {
+    public LaporanBosp update(Long id, LaporanBospDTO dto, MultipartFile[] multipartFiles) throws Exception {
         Optional<LaporanBosp> laporanOpt = laporanRepo.findById(id);
 
         if (laporanOpt.isPresent()) {
             LaporanBosp laporan = laporanOpt.get();
-
             laporan.setNama(dto.getNama());
             laporan.setDeskripsi(dto.getDeskripsi());
-            laporan.setFiles(dto.getFiles());
+
+            if (multipartFiles != null && multipartFiles.length > 0) {
+                String[] fileUrls = new String[multipartFiles.length];
+                for (int i = 0; i < multipartFiles.length; i++) {
+                    fileUrls[i] = uploadFile(multipartFiles[i]);
+                }
+                laporan.setFiles(fileUrls);
+            }
 
             return laporanRepo.save(laporan);
         } else {
-            System.out.println("Entity with id " + id + " not found.");
-            return null; // Tambahkan ini jika tidak ingin throw exception
+            throw new Exception("LaporanBosp not found with id " + id);
         }
     }
 
@@ -152,26 +164,26 @@ public class LaporanBospService {
     //     System.out.println("File size: " + file.length());
     //     return file;
     // }
-    // private String extractFileUrlFromResponse(String responseBody) throws IOException {
-    //     ObjectMapper mapper = new ObjectMapper();
-    //     JsonNode jsonResponse = mapper.readTree(responseBody);
-    //     JsonNode dataNode = jsonResponse.path("data");
-    //     String urlFile = dataNode.path("url_file").asText();
-    //     return urlFile;
-    // }
-    // private String uploadFile(MultipartFile multipartFile) throws IOException {
-    //     RestTemplate restTemplate = new RestTemplate();
-    //     // String base_url = "https://s3.lynk2.co/api/s3/slbc/images";
-    //     String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
-    //     org.springframework.http.HttpHeaders headers = new HttpHeaders();
-    //     headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-    //     MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-    //     body.add("file", multipartFile.getResource());
-    //     HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-    //     ResponseEntity<String> response = restTemplate.exchange(base_url, HttpMethod.POST, requestEntity, String.class);
-    //     String fileUrl = extractFileUrlFromResponse(response.getBody());
-    //     return fileUrl;
-    // }
+     private String extractFileUrlFromResponse(String responseBody) throws IOException {
+         ObjectMapper mapper = new ObjectMapper();
+         JsonNode jsonResponse = mapper.readTree(responseBody);
+         JsonNode dataNode = jsonResponse.path("data");
+         String urlFile = dataNode.path("url_file").asText();
+         return urlFile;
+     }
+     private String uploadFile(MultipartFile multipartFile) throws IOException {
+         RestTemplate restTemplate = new RestTemplate();
+         // String base_url = "https://s3.lynk2.co/api/s3/slbc/images";
+         String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+         org.springframework.http.HttpHeaders headers = new HttpHeaders();
+         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+         body.add("file", multipartFile.getResource());
+         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+         ResponseEntity<String> response = restTemplate.exchange(base_url, HttpMethod.POST, requestEntity, String.class);
+         String fileUrl = extractFileUrlFromResponse(response.getBody());
+         return fileUrl;
+     }
     // SAMPAI SINI
 //    private String uploadFile(File file, String fileName) throws IOException {
 //        BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com", fileName);

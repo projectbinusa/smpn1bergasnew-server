@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,21 +27,22 @@ public class LaporanBospController {
     @Autowired
     private LaporanBospService laporanService;
 
-    @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<LaporanBosp>> createLaporan(LaporanBospDTO laporan) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CommonResponse<LaporanBosp>> createLaporan(
+            @RequestPart("laporan") LaporanBospDTO laporan,
+            @RequestPart(value = "files", required = false) MultipartFile[] multipartFiles) {
         CommonResponse<LaporanBosp> response = new CommonResponse<>();
         try {
-            LaporanBosp laporans = laporanService.save(laporan);
+            LaporanBosp saved = laporanService.save(laporan, multipartFiles);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
-            response.setData(laporans);
+            response.setData(saved);
             response.setMessage("Laporan created successfully.");
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setData(null);
-            response.setMessage("Failed to create laporan: " + e.getMessage());
+            response.setMessage(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -76,38 +78,27 @@ public class LaporanBospController {
         }
     }
 
-    @PutMapping(path = "/put/{id}")
-    public ResponseEntity<CommonResponse<LaporanBosp>> updateLaporanBosp(@PathVariable("id") Long id, @RequestBody LaporanBospDTO laporan) throws SQLException, ClassNotFoundException {
+    @PutMapping(path = "/put/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CommonResponse<LaporanBosp>> updateLaporan(
+            @PathVariable Long id,
+            @RequestPart("laporan") LaporanBospDTO laporan,
+            @RequestPart(value = "files", required = false) MultipartFile[] multipartFiles) {
         CommonResponse<LaporanBosp> response = new CommonResponse<>();
         try {
-            Optional<LaporanBosp> currentLaporanBosp = laporanService.findById(id);
-
-            if (!currentLaporanBosp.isPresent()) {
-                response.setStatus("error");
-                response.setCode(HttpStatus.NOT_FOUND.value());
-                response.setData(null);
-                response.setMessage("Laporan with id " + id + " not found.");
-                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-            }
-
-            // Update laporan here...
-
-            LaporanBosp lapoan = laporanService.update(id, laporan);
+            LaporanBosp updated = laporanService.update(id, laporan, multipartFiles);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
-            response.setData(lapoan);
+            response.setData(updated);
             response.setMessage("Laporan updated successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setData(null);
-            response.setMessage("Failed to update laporan: " + e.getMessage());
+            response.setMessage(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
- 
+
     // @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
     // public ResponseEntity<CommonResponse<Berita>> updateFoto(@PathVariable("id") Long id, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
     //     CommonResponse<Berita> response = new CommonResponse<>();

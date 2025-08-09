@@ -74,4 +74,6 @@ public class Galeri extends DateConfig {
     public void setCategoryGalery(CategoryGalery categoryGalery) {
         this.categoryGalery = categoryGalery;
     }
+
+
 }
