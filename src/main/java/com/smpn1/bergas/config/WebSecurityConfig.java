@@ -120,6 +120,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "/api/program/all/terbaru/**",
         "/api/category_galery/all/**",
         "/api/category_galery/get/**",
+        "/api/laporanbosp/all",
+        "/api/laporanbosp/get/{id}",
         // "/api/laporanbosp/**"
     };
 
