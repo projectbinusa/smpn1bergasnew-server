@@ -12,7 +12,6 @@ import java.util.List;
 
 
 @Repository
-
 public interface BeritaRepository extends CrudRepository<Berita, Integer> {
     Berita findById(long id);
     Page<Berita> findAll(Pageable pageable);

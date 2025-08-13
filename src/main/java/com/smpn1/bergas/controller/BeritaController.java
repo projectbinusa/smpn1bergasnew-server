@@ -2,6 +2,7 @@ package com.smpn1.bergas.controller;
 
 import com.smpn1.bergas.DTO.BeritaDTO;
 import com.smpn1.bergas.model.Berita;
+import com.smpn1.bergas.model.Galeri;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.BeritaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,24 +28,48 @@ public class BeritaController {
     @Autowired
     private BeritaService beritaService;
 
-    @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Berita>> createberita2(BeritaDTO berita) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<Berita>> addBerita(
+            @RequestPart("berita") Berita berita,
+            @RequestPart("files") MultipartFile[] files) {
+
         CommonResponse<Berita> response = new CommonResponse<>();
         try {
-            Berita berita1 = beritaService.save(berita);
+            Berita result = beritaService.add(berita, files);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
-            response.setData(berita1);
+            response.setData(result);
             response.setMessage("Berita created successfully.");
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setData(null);
-            response.setMessage("Failed to create berita: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setMessage("Failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+
+//    @PostMapping(path = "/add", consumes = "multipart/form-data")
+//    public ResponseEntity<CommonResponse<Galeri>> addGaleri(
+//            @RequestPart("galeri") Galeri galeri,
+//            @RequestPart("files") MultipartFile[] files) {
+//        CommonResponse<Galeri> response = new CommonResponse<>();
+//        try {
+//            Galeri result = galeriService.add(galeri, files);
+//            response.setStatus("success");
+//            response.setCode(HttpStatus.CREATED.value());
+//            response.setData(result);
+//            response.setMessage("Galeri created successfully.");
+//            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+//        } catch (Exception e) {
+//            response.setStatus("error");
+//            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+//            response.setMessage("Failed: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+//        }
+//    }
+
 
     @GetMapping(path = "/all")
     public ResponseEntity<CommonResponse<Page<Berita>>> listAllBerita(

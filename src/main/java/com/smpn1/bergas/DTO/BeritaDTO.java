@@ -7,6 +7,7 @@ public class BeritaDTO {
     private String author;
     private String isiBerita;
     private String category;
+    private String image;
     public Long getId() {
         return id;
     }
@@ -45,5 +46,13 @@ public class BeritaDTO {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.storage.*;
 import com.smpn1.bergas.DTO.BeritaDTO;
 import com.smpn1.bergas.model.Berita;
+import com.smpn1.bergas.model.Galeri;
 import com.smpn1.bergas.repository.BeritaRepository;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -30,6 +31,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -52,15 +54,22 @@ public class BeritaService {
 
 //    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
 
-    public Berita save(BeritaDTO berita) throws Exception {
-        Berita newBerita = new Berita();
-        newBerita.setAuthor(berita.getAuthor());
-        newBerita.setJudulBerita(berita.getJudulBerita());
-        newBerita.setIsiBerita(berita.getIsiBerita());
-        newBerita.setCategoryBerita(berita.getCategory());
 
-        return beritaDao.save(newBerita);
+    public Berita add(Berita berita, MultipartFile[] files) throws Exception {
+        List<String> uploadedUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String url = uploadFile(file);
+            uploadedUrls.add(url);
+        }
+
+        if (!uploadedUrls.isEmpty()) {
+            berita.setImage(uploadedUrls.get(0));
+        }
+
+        return beritaDao.save(berita);
     }
+
+
 
     public Optional<Berita> findById(Long id) {
         return Optional.ofNullable(beritaDao.findById(id));
