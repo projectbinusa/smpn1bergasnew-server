@@ -3,6 +3,7 @@ package com.smpn1.bergas.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.DTO.StrukturDTO;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Struktur;
 import com.smpn1.bergas.repository.StrukturRepository;
 import com.google.auth.Credentials;
@@ -28,9 +29,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class StrukturService {
@@ -39,15 +38,18 @@ public class StrukturService {
     private StrukturRepository strukturRepository;
 
 
+    public Struktur add(Struktur struktur, MultipartFile[] files) throws Exception {
+        List<String> uploadedUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String url = uploadFile(file);
+            uploadedUrls.add(url);
+        }
 
-    public Struktur add(StrukturDTO struktur) throws Exception {
-        Struktur newStruktur = new Struktur();
-        newStruktur.setNama(struktur.getNama());
-        newStruktur.setJabatan(struktur.getJabatan());
-        newStruktur.setTugas(struktur.getTugas());
-//        newStruktur.setJenisStruktur(struktur.getJenis());
+        if (!uploadedUrls.isEmpty()) {
+            struktur.setFoto(uploadedUrls.get(0));
+        }
 
-        return strukturRepository.save(newStruktur);
+        return strukturRepository.save(struktur);
     }
 
     public Struktur findById(Long id) {

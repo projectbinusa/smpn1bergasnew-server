@@ -2,6 +2,7 @@ package com.smpn1.bergas.controller;
 
 
 
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Guru;
 import com.smpn1.bergas.model.Guru;
 import com.smpn1.bergas.response.CommonResponse;
@@ -25,24 +26,45 @@ public class GuruController {
     @Autowired
     private GuruService guruService;
 
-    @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Guru>> add(@RequestBody Guru prestasi) throws SQLException, ClassNotFoundException {
+//    @PostMapping(path = "/add")
+//    public ResponseEntity<CommonResponse<Guru>> add(@RequestBody Guru prestasi) throws SQLException, ClassNotFoundException {
+//        CommonResponse<Guru> response = new CommonResponse<>();
+//        try {
+//            Guru prestasi1 = guruService.add(prestasi);
+//            response.setStatus("success");
+//            response.setCode(HttpStatus.CREATED.value());
+//            response.setData(prestasi1);
+//            response.setMessage("Guru created successfully.");
+//            return new ResponseEntity<>(response, HttpStatus.CREATED);
+//        } catch (Exception e) {
+//            response.setStatus("error");
+//            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+//            response.setData(null);
+//            response.setMessage("Failed to create guru: " + e.getMessage());
+//            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//    }
+    @PostMapping(path = "/add", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<Guru>> add(
+            @RequestPart("guru") Guru guru,
+            @RequestPart("files") MultipartFile[] files) {
+
         CommonResponse<Guru> response = new CommonResponse<>();
         try {
-            Guru prestasi1 = guruService.add(prestasi);
+            Guru result = guruService.add(guru, files);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
-            response.setData(prestasi1);
+            response.setData(result);
             response.setMessage("Guru created successfully.");
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setData(null);
-            response.setMessage("Failed to create guru: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setMessage("Guru: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
     @GetMapping(path = "/all")
     public ResponseEntity<CommonResponse<Page<Guru>>> listAllGuru(
             @RequestParam(defaultValue = "0") int page,
@@ -127,6 +149,7 @@ public class GuruController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
     public ResponseEntity<CommonResponse<Guru>> updateGuru(@PathVariable("id") Long id, @RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
         CommonResponse<Guru> response = new CommonResponse<>();

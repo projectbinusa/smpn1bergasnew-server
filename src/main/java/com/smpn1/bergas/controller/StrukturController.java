@@ -3,6 +3,7 @@ package com.smpn1.bergas.controller;
 
 
 import com.smpn1.bergas.DTO.StrukturDTO;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Struktur;
 import com.smpn1.bergas.model.Struktur;
 import com.smpn1.bergas.response.CommonResponse;
@@ -26,24 +27,28 @@ public class StrukturController {
     @Autowired
     private StrukturService strukturService;
 
-    @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Struktur>> add(@RequestBody StrukturDTO struktur) throws SQLException, ClassNotFoundException {
+    @PostMapping(path = "/add", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<Struktur>> add(
+            @RequestPart("struktur") Struktur struktur,
+            @RequestPart("files") MultipartFile[] files) {
+
         CommonResponse<Struktur> response = new CommonResponse<>();
         try {
-            Struktur struktur1 = strukturService.add(struktur);
+            Struktur result = strukturService.add(struktur, files);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
-            response.setData(struktur1);
-            response.setMessage("Struktur created successfully.");
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
+            response.setData(result);
+            response.setMessage("Berita created successfully.");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setData(null);
-            response.setMessage("Failed to create struktur: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setMessage("Failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
+
     @GetMapping(path = "/all")
     public ResponseEntity<CommonResponse<Page<Struktur>>> listAllStruktur(
             @RequestParam(defaultValue = "0") int page,

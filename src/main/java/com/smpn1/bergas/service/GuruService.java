@@ -3,6 +3,7 @@ package com.smpn1.bergas.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.model.Alumni;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Guru;
 import com.smpn1.bergas.repository.GuruRepository;
 import com.google.auth.Credentials;
@@ -28,9 +29,7 @@ import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class GuruService {
@@ -40,9 +39,23 @@ public class GuruService {
     @Autowired
     private GuruRepository guruRepository;
 
-    public Guru add(Guru guru ) throws Exception {
+
+    // Service
+    public Guru add(Guru guru, MultipartFile[] files) throws Exception {
+        List<String> uploadedUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String url = uploadFile(file);
+            uploadedUrls.add(url);
+        }
+
+        if (!uploadedUrls.isEmpty()) {
+            guru.setFoto(uploadedUrls.get(0));
+        }
+
         return guruRepository.save(guru);
     }
+
+
     public Guru getById(Long id){
         return guruRepository.findById(id).orElse(null);
     }
@@ -60,6 +73,7 @@ public class GuruService {
         update.setRiwayat(guru.getRiwayat());
         return guruRepository.save(update);
     }
+
     public Guru editFoto( MultipartFile multipartFile , Long id) throws Exception {
         Guru update = guruRepository.findById(id).orElse(null);
         String image = uploadFile(multipartFile);
