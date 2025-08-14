@@ -23,6 +23,13 @@ public class VisiMisi extends DateConfig {
     @Column(name = "tujuan")
     private String tujuan;
 
+    @Lob
+    @Column(name = "analisis_lingkungan_internal")
+    private String analisis_lingkungan_internal;
+
+    @Lob
+    @Column(name = "sasaran_sekolah")
+    private String sasaran_sekolah;
 
 
     public Long getId() {
@@ -55,5 +62,21 @@ public class VisiMisi extends DateConfig {
 
     public void setTujuan(String tujuan) {
         this.tujuan = tujuan;
+    }
+
+    public String getAnalisis_lingkungan_internal() {
+        return analisis_lingkungan_internal;
+    }
+
+    public void setAnalisis_lingkungan_internal(String analisis_lingkungan_sekolah) {
+        this.analisis_lingkungan_internal = analisis_lingkungan_sekolah;
+    }
+
+    public String getSasaran_sekolah() {
+        return sasaran_sekolah;
+    }
+
+    public void setSasaran_sekolah(String sasaran_sekolah) {
+        this.sasaran_sekolah = sasaran_sekolah;
     }
 }

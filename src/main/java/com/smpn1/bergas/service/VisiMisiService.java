@@ -33,6 +33,8 @@ public class VisiMisiService {
         update.setMisi(visiMisi.getMisi());
         update.setVisi(visiMisi.getVisi());
         update.setTujuan(visiMisi.getTujuan());
+        update.setAnalisis_lingkungan_internal(visiMisi.getAnalisis_lingkungan_internal());
+        update.setSasaran_sekolah(visiMisi.getSasaran_sekolah());
         return visiMisiRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {
