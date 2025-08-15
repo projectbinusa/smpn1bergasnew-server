@@ -31,9 +31,10 @@ public class Galeri extends DateConfig {
     @Column(name = "deskripsi")
     private String deskripsi;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryGalery categoryGalery;
+
 
     public Long getId() {
         return id;

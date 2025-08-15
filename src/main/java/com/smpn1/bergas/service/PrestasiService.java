@@ -75,6 +75,10 @@ public class PrestasiService {
     public Page<Prestasi> getAllTerbaru(Pageable pageable) {
         return prestasiRepository.getAll(pageable);
     }
+    public Page<Prestasi> searchPrestasi(String keyword, Pageable pageable) {
+        return prestasiRepository.searchAll(keyword, pageable);
+    }
+
     public Map<String, Boolean> delete(Long id) {
         try {
             prestasiRepository.deleteById(id);

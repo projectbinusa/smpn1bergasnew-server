@@ -69,27 +69,34 @@ public class PrestasiController {
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<Prestasi>>> listAllPrestasiTerbaru(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "") String search
     ) {
-
         Pageable pageable = PageRequest.of(page, size);
 
         CommonResponse<Page<Prestasi>> response = new CommonResponse<>();
         try {
-            Page<Prestasi> beritaPage = prestasiService.getAllTerbaru(pageable);
+            Page<Prestasi> beritaPage;
+            if (search.isEmpty()) {
+                beritaPage = prestasiService.getAllTerbaru(pageable);
+            } else {
+                beritaPage = prestasiService.searchPrestasi(search, pageable);
+            }
+
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
-            response.setMessage(" Prestasi list retrieved successfully.");
+            response.setMessage("Prestasi list retrieved successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
-            response.setMessage("Failed to retrieve guru list: " + e.getMessage());
+            response.setMessage("Failed to retrieve prestasi list: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
     public ResponseEntity<CommonResponse<Prestasi>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
         CommonResponse<Prestasi> response = new CommonResponse<>();
