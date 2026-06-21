@@ -1,10 +1,13 @@
 package com.smpn1.bergas.controller;
 
 import com.smpn1.bergas.DTO.BeritaDTO;
+import com.smpn1.bergas.config.JwtTokenUtil;
 import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Galeri;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.BeritaService;
+import com.smpn1.bergas.util.DomainUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +23,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/api/berita")
 @CrossOrigin(origins = "*")
@@ -28,48 +33,63 @@ public class BeritaController {
     @Autowired
     private BeritaService beritaService;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private DomainUtil domainUtil;
+
     @PostMapping(path = "/add", consumes = "multipart/form-data")
     public ResponseEntity<CommonResponse<Berita>> addBerita(
+            HttpServletRequest request,
             @RequestPart("berita") Berita berita,
             @RequestPart("files") MultipartFile[] files) {
 
         CommonResponse<Berita> response = new CommonResponse<>();
+
         try {
-            Berita result = beritaService.add(berita, files);
+            String token = request.getHeader("Authorization").substring(7);
+
+            Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+            Berita result = beritaService.add(berita, files, userId);
+
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(result);
             response.setMessage("Berita created successfully.");
+
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
         } catch (Exception e) {
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setMessage("Failed: " + e.getMessage());
+
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-
-//    @PostMapping(path = "/add", consumes = "multipart/form-data")
-//    public ResponseEntity<CommonResponse<Galeri>> addGaleri(
-//            @RequestPart("galeri") Galeri galeri,
-//            @RequestPart("files") MultipartFile[] files) {
-//        CommonResponse<Galeri> response = new CommonResponse<>();
-//        try {
-//            Galeri result = galeriService.add(galeri, files);
-//            response.setStatus("success");
-//            response.setCode(HttpStatus.CREATED.value());
-//            response.setData(result);
-//            response.setMessage("Galeri created successfully.");
-//            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-//        } catch (Exception e) {
-//            response.setStatus("error");
-//            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-//            response.setMessage("Failed: " + e.getMessage());
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-//        }
-//    }
-
+    // @PostMapping(path = "/add", consumes = "multipart/form-data")
+    // public ResponseEntity<CommonResponse<Galeri>> addGaleri(
+    // @RequestPart("galeri") Galeri galeri,
+    // @RequestPart("files") MultipartFile[] files) {
+    // CommonResponse<Galeri> response = new CommonResponse<>();
+    // try {
+    // Galeri result = galeriService.add(galeri, files);
+    // response.setStatus("success");
+    // response.setCode(HttpStatus.CREATED.value());
+    // response.setData(result);
+    // response.setMessage("Galeri created successfully.");
+    // return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    // } catch (Exception e) {
+    // response.setStatus("error");
+    // response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    // response.setMessage("Failed: " + e.getMessage());
+    // return
+    // ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    // }
+    // }
 
     @GetMapping(path = "/all")
     public ResponseEntity<CommonResponse<Page<Berita>>> listAllBerita(
@@ -102,9 +122,52 @@ public class BeritaController {
         }
     }
 
-//    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
+    @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<Berita>>> listAllBerita(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<Berita>> response = new CommonResponse<>();
+
+        try {
+            Page<Berita> beritaPage = beritaService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage("Berita list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve berita list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
     @PutMapping(path = "/put/{id}")
-    public ResponseEntity<CommonResponse<Berita>> updateBerita(@PathVariable("id") Long id, @RequestBody BeritaDTO berita) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Berita>> updateBerita(@PathVariable("id") Long id,
+            @RequestBody BeritaDTO berita) throws SQLException, ClassNotFoundException {
         CommonResponse<Berita> response = new CommonResponse<>();
         try {
             Optional<Berita> currentBerita = beritaService.findById(id);
@@ -133,8 +196,10 @@ public class BeritaController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
- @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Berita>> updateFoto(@PathVariable("id") Long id, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+
+    @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<Berita>> updateFoto(@PathVariable("id") Long id,
+            @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
         CommonResponse<Berita> response = new CommonResponse<>();
         try {
             Optional<Berita> currentBerita = beritaService.findById(id);
@@ -165,7 +230,8 @@ public class BeritaController {
     }
 
     @DeleteMapping(path = "/delete/{id}")
-    public ResponseEntity<CommonResponse<String>> deleteberita(@PathVariable("id") Long id) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<String>> deleteberita(@PathVariable("id") Long id)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<String> response = new CommonResponse<>();
         try {
             beritaService.delete(id);
@@ -184,10 +250,13 @@ public class BeritaController {
     }
 
     @GetMapping(path = "/terbaru")
-    public ResponseEntity<CommonResponse<List<Berita>>> listBeritaTerbaru() throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<List<Berita>>> listBeritaTerbaru(
+            HttpServletRequest request)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<List<Berita>> response = new CommonResponse<>();
         try {
-            List<Berita> berita = beritaService.beritaTerbaru();
+            Long userId = domainUtil.getCurrentUserId(request);
+            List<Berita> berita = beritaService.beritaTerbaru(userId);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(berita);
@@ -207,7 +276,7 @@ public class BeritaController {
         CommonResponse<List<Berita>> response = new CommonResponse<>();
         try {
             List<Berita> beritas = beritaService.searchBerita(judul);
-            if(beritas.isEmpty()) {
+            if (beritas.isEmpty()) {
                 response.setStatus("not found");
                 response.setCode(HttpStatus.NOT_FOUND.value());
                 response.setData(null);
@@ -229,11 +298,12 @@ public class BeritaController {
     }
 
     @GetMapping(path = "/arsip")
-    public ResponseEntity<CommonResponse<List<Berita>>> listBeritaArsip(@RequestParam("bulan") String bulan) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<List<Berita>>> listBeritaArsip(@RequestParam("bulan") String bulan)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<List<Berita>> response = new CommonResponse<>();
         try {
             List<Berita> berita = beritaService.arsip(bulan);
-            if(berita.isEmpty()) {
+            if (berita.isEmpty()) {
                 response.setStatus("not found");
                 response.setCode(HttpStatus.NOT_FOUND.value());
                 response.setData(null);
@@ -255,7 +325,8 @@ public class BeritaController {
     }
 
     @GetMapping(path = "/get/{id}")
-    public ResponseEntity<CommonResponse<Berita>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Berita>> get(@PathVariable("id") long id)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Berita> response = new CommonResponse<>();
         try {
             Berita berita1 = beritaService.getBeritaById(id);
@@ -273,20 +344,43 @@ public class BeritaController {
         }
     }
 
-
-
-
+    private String toCamelCase(String input) {
+        if (input == null || !input.contains("_")) {
+            return input;
+        }
+        String[] parts = input.split("_");
+        StringBuilder result = new StringBuilder(parts[0]);
+        for (int i = 1; i < parts.length; i++) {
+            if (!parts[i].isEmpty()) {
+                result.append(parts[i].substring(0, 1).toUpperCase())
+                        .append(parts[i].substring(1));
+            }
+        }
+        return result.toString();
+    }
 
     @GetMapping("/by-category")
     public ResponseEntity<CommonResponse<Page<Berita>>> allByCategory(
-            @RequestParam("category") String category,
+            HttpServletRequest request,
+            @RequestParam("category") String categoryBerita,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size,
-            @RequestParam(value = "sort", defaultValue = "created_date") String sort,
+            @RequestParam(value = "sort", defaultValue = "createdDate") String sort,
             @RequestParam(value = "order", defaultValue = "asc") String order) {
+
         try {
-            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sort));
-            Page<Berita> beritas = beritaService.getByCategory(category, pageable);
+
+            Long userId = domainUtil.getCurrentUserId(request);
+
+            Pageable pageable = PageRequest.of(
+                    page,
+                    size,
+                    Sort.by(Sort.Direction.fromString(order), toCamelCase(sort)));
+
+            Page<Berita> beritas = beritaService.getByCategoryAndUserId(
+                    categoryBerita,
+                    userId,
+                    pageable);
 
             CommonResponse<Page<Berita>> response = new CommonResponse<>();
             response.setStatus("success");
@@ -295,7 +389,9 @@ public class BeritaController {
             response.setMessage("Berita list retrieved successfully.");
 
             return new ResponseEntity<>(response, HttpStatus.OK);
+
         } catch (Exception e) {
+
             CommonResponse<Page<Berita>> response = new CommonResponse<>();
             response.setStatus("error");
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -326,7 +422,8 @@ public class BeritaController {
     }
 
     @GetMapping(path = "/terbaru-by-category")
-    public ResponseEntity<CommonResponse<List<Berita>>> beritaTerbaruByCategory(@RequestParam("categoryId") Long categoryId) {
+    public ResponseEntity<CommonResponse<List<Berita>>> beritaTerbaruByCategory(
+            @RequestParam("categoryId") Long categoryId) {
         CommonResponse<List<Berita>> response = new CommonResponse<>();
         try {
             List<Berita> beritas = beritaService.terbaruByCategory(categoryId);

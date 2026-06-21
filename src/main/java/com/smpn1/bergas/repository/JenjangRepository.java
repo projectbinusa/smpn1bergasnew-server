@@ -12,4 +12,8 @@ public interface JenjangRepository extends JpaRepository<Jenjang, Long> {
 
     @Query(value = "SELECT * FROM jenjang WHERE link = :link LIMIT 1", nativeQuery = true)
     Jenjang findByLink(String link);
+
+    Page<Jenjang> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
 }

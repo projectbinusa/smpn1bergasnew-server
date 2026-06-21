@@ -10,32 +10,43 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-
 @Repository
 public interface BeritaRepository extends CrudRepository<Berita, Integer> {
-    Berita findById(long id);
-    Page<Berita> findAll(Pageable pageable);
-    Page<Berita> findAllByOrderByUpdatedDateDesc(Pageable pageable);
-    List<Berita> findFirst5ByOrderByUpdatedDateDesc();
-    @Query(value = "SELECT * FROM berita  WHERE category = :category ", nativeQuery = true)
-    Page<Berita> findByCategoryBerita_Id(String category, Pageable pageable);
+        Berita findById(long id);
 
-    @Query("SELECT p FROM Berita p WHERE " +
-            "p.judulBerita LIKE CONCAT('%',:judul, '%')")
-    List<Berita> searchByJudulBerita(String judul);
+        Page<Berita> findAll(Pageable pageable);
 
-    @Query("SELECT p FROM Berita p WHERE DATE_FORMAT(p.createdDate, '%Y-%m') LIKE CONCAT('%', :bulan, '%')")
-    List<Berita> find(String bulan);
+        Page<Berita> findAllByOrderByUpdatedDateDesc(Pageable pageable);
 
+        Page<Berita> findByUserIdOrderByUpdatedDateDesc(
+                        Long userId,
+                        Pageable pageable);
 
-    @Query("SELECT SUBSTRING(b.judulBerita, 1, LOCATE(' ', b.judulBerita) - 1) FROM Berita b WHERE b.id = :id")
-    String getByIdBerita(Long id);
+        List<Berita> findFirst5ByOrderByUpdatedDateDesc();
 
-    @Query(value = "SELECT * FROM berita WHERE judul_berita LIKE %:judul% LIMIT 4", nativeQuery = true)
-    List<Berita> relatedPost(@Param("judul") String judul);
+        List<Berita> findFirst5ByUserIdOrderByUpdatedDateDesc(Long userId);     
 
-    @Query(value = "SELECT * FROM berita WHERE category_id = :categoryId ORDER BY updated_date DESC LIMIT 5", nativeQuery = true)
-    List<Berita> terbaruByCategory(Long categoryId);
+        @Query(value = "SELECT * FROM berita  WHERE category_id = :category_id ", nativeQuery = true)
+        Page<Berita> findByCategoryBerita_Id(Long category_id, Pageable pageable);
 
+        @Query("SELECT p FROM Berita p WHERE " +
+                        "p.judulBerita LIKE CONCAT('%',:judul, '%')")
+        List<Berita> searchByJudulBerita(String judul);
+
+        @Query("SELECT p FROM Berita p WHERE DATE_FORMAT(p.createdDate, '%Y-%m') LIKE CONCAT('%', :bulan, '%')")
+        List<Berita> find(String bulan);
+
+        @Query("SELECT SUBSTRING(b.judulBerita, 1, LOCATE(' ', b.judulBerita) - 1) FROM Berita b WHERE b.id = :id")
+        String getByIdBerita(Long id);
+
+        @Query(value = "SELECT * FROM berita WHERE judul_berita LIKE %:judul% LIMIT 4", nativeQuery = true)
+        List<Berita> relatedPost(@Param("judul") String judul);
+
+        @Query(value = "SELECT * FROM berita WHERE category_id = :categoryId ORDER BY updated_date DESC LIMIT 5", nativeQuery = true)
+        List<Berita> terbaruByCategory(Long categoryId);
+
+        Page<Berita> findByCategoryBeritaAndUserId(
+                        String categoryBerita,
+                        Long userId,
+                        Pageable pageable);
 }
-

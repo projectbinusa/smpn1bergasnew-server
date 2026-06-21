@@ -2,6 +2,8 @@ package com.smpn1.bergas.model;
 
 import com.smpn1.bergas.auditing.DateConfig;
 
+
+
 import javax.persistence.*;
 
 @Entity
@@ -30,6 +32,13 @@ public class VisiMisi extends DateConfig {
     @Lob
     @Column(name = "sasaran_sekolah")
     private String sasaran_sekolah;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
 
 
     public Long getId() {
@@ -78,5 +87,21 @@ public class VisiMisi extends DateConfig {
 
     public void setSasaran_sekolah(String sasaran_sekolah) {
         this.sasaran_sekolah = sasaran_sekolah;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+   public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

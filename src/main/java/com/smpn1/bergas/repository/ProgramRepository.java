@@ -9,16 +9,20 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface ProgramRepository extends JpaRepository<Program , Long> {
-    @Query(value = "SELECT * FROM program ORDER BY updated_date DESC" ,nativeQuery = true)
+public interface ProgramRepository extends JpaRepository<Program, Long> {
+    @Query(value = "SELECT * FROM program ORDER BY updated_date DESC", nativeQuery = true)
     Page<Program> getAll(Pageable pageable);
 
-    @Query(value = "SELECT * FROM program WHERE judul_program = :judul", nativeQuery = true)
-    Page<Program> getByJudul(String judul , Pageable pageable);
+    @Query(value = "SELECT * FROM program WHERE user_id = :userId and judul_program = :judul", nativeQuery = true)
+    Page<Program> getByJudul(Long userId, String judul, Pageable pageable);
 
-    @Query(value = "SELECT * FROM program WHERE category_id = :id" , nativeQuery = true)
+    @Query(value = "SELECT * FROM program WHERE category_id = :id", nativeQuery = true)
     List<Program> findByIdCategory(Long id);
 
-    @Query(value = "SELECT * FROM program WHERE category_id = :id" , nativeQuery = true)
-    Page<Program> findByIdCategory(Long id , Pageable pageable);
+    @Query(value = "SELECT * FROM program WHERE category_id = :id", nativeQuery = true)
+    Page<Program> findByIdCategory(Long id, Pageable pageable);
+
+    Page<Program> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
 }

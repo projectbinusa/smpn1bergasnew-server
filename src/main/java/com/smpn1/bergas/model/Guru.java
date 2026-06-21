@@ -1,12 +1,20 @@
 package com.smpn1.bergas.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Table;
+
 import com.smpn1.bergas.auditing.DateConfig;
 
-import javax.persistence.*;
+
 
 @Entity
 @Table(name = "guru")
-public class Guru  extends DateConfig {
+public class Guru extends DateConfig {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,6 +33,14 @@ public class Guru  extends DateConfig {
 
     @Column(name = "riwayat_pendidikan")
     private String riwayat;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
+
 
     public String getNip() {
         return nip;
@@ -72,5 +88,21 @@ public class Guru  extends DateConfig {
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+   public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

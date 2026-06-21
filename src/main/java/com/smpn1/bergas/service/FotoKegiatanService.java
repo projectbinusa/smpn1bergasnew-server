@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.storage.*;
 import com.smpn1.bergas.DTO.FotoKegiatanDTO;
 import com.smpn1.bergas.model.Alumni;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.FotoKegiatan;
 import com.smpn1.bergas.repository.FotoKegiatanRepository;
 import com.smpn1.bergas.repository.KegiatanRepository;
+import com.smpn1.bergas.util.SecurityUtil;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,7 @@ import java.util.Map;
 
 @Service
 public class FotoKegiatanService {
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
 
 //    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
     @Autowired
@@ -47,10 +49,15 @@ public class FotoKegiatanService {
     @Autowired
     private KegiatanRepository kegiatanRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public FotoKegiatan add(FotoKegiatanDTO fotoKegiatanDTO, MultipartFile multipartFile) throws Exception {
         FotoKegiatan fotoKegiatan = new FotoKegiatan();
         String image = uploadFile(multipartFile);
         fotoKegiatan.setFoto(image);
+        fotoKegiatan.setUserId(securityUtil.getCurrentUserId());
+        fotoKegiatan.setUserName(securityUtil.getCurrentUsername());
         fotoKegiatan.setKegiatan(kegiatanRepository.findById(fotoKegiatanDTO.getId_kegiatan()).orElse(null));
         return fotoKegiatanRepository.save(fotoKegiatan);
     }
@@ -60,21 +67,32 @@ public class FotoKegiatanService {
     public Page<FotoKegiatan> getAll(Pageable pageable){
         return fotoKegiatanRepository.findAll(pageable);
     }
+     public Page<FotoKegiatan> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return fotoKegiatanRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
     public Page<FotoKegiatan> getAllTerbaru(Pageable pageable) {
         return fotoKegiatanRepository.getAll(pageable);
     }
-    public Page<FotoKegiatan> getAllByKegiatan(Long id ,Pageable pageable){
-        return fotoKegiatanRepository.findByKegiatanId(id,pageable);
+    public Page<FotoKegiatan> getAllByKegiatan(Long id, Long userId, Pageable pageable){
+        return fotoKegiatanRepository.findByKegiatanIdAndUserId(id, userId, pageable);
     }
     public FotoKegiatan edit(FotoKegiatanDTO fotoKegiatan , Long id) throws Exception {
         FotoKegiatan update = fotoKegiatanRepository.findById(id).orElse(null);
         update.setKegiatan(kegiatanRepository.findById(fotoKegiatan.getId_kegiatan()).orElse(null));
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return fotoKegiatanRepository.save(update);
     }
     public FotoKegiatan editFoto( MultipartFile multipartFile , Long id) throws Exception {
         FotoKegiatan update = fotoKegiatanRepository.findById(id).orElse(null);
         String image = uploadFile(multipartFile);
         update.setFoto(image);
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return fotoKegiatanRepository.save(update);
     }
 
@@ -127,7 +145,7 @@ public class FotoKegiatanService {
     }
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         org.springframework.http.HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

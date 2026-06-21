@@ -5,6 +5,8 @@ import com.smpn1.bergas.model.FotoSarana;
 import com.smpn1.bergas.model.Sarana;
 import com.smpn1.bergas.repository.FotoSaranaRepository;
 import com.smpn1.bergas.repository.SaranaRepository;
+import com.smpn1.bergas.util.SecurityUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +25,12 @@ public class SaranaService {
     @Autowired
     private FotoSaranaRepository fotoSaranaRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public Sarana add(Sarana sarana){
+        sarana.setUserId(securityUtil.getCurrentUserId());
+        sarana.setUserName(securityUtil.getCurrentUsername());
         return saranaRepository.save(sarana);
     }
     public Sarana getById(Long id){
@@ -32,17 +39,26 @@ public class SaranaService {
     public Page<Sarana> getAll(Pageable pageable){
         return saranaRepository.findAll(pageable);
     }
+    public Page<Sarana> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return saranaRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
     public Page<Sarana> getAllTerbaru(Pageable pageable) {
         return saranaRepository.getAll(pageable);
     }
-    public Page<Sarana> getAllCategory(String category ,Pageable pageable) {
-        return saranaRepository.getAllByCategory(category,pageable);
+    public Page<Sarana> getAllCategory(Long userId, String category, Pageable pageable) {
+        return saranaRepository.getAllByCategory(userId, category, pageable);
     }
     public Sarana edit(Sarana sarana ,Long id){
         Sarana update = saranaRepository.findById(id).orElse(null);
         update.setNama_sarana(sarana.getNama_sarana());
         update.setDeskripsi(sarana.getDeskripsi());
         update.setCategory(sarana.getCategory());
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return saranaRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {

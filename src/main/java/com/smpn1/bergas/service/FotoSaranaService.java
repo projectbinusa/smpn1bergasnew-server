@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.DTO.FotoSaranaDTO;
 import com.smpn1.bergas.model.Alumni;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.FotoSarana;
 import com.smpn1.bergas.repository.FotoSaranaRepository;
 import com.smpn1.bergas.repository.SaranaRepository;
+import com.smpn1.bergas.util.SecurityUtil;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
@@ -36,7 +38,7 @@ import java.util.Map;
 
 @Service
 public class FotoSaranaService {
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
     @Autowired
@@ -45,10 +47,15 @@ public class FotoSaranaService {
     @Autowired
     private SaranaRepository saranaRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public FotoSarana add(FotoSaranaDTO fotoSaranaDTO, MultipartFile multipartFile) throws Exception {
         FotoSarana fotoSarana = new FotoSarana();
         String image = uploadFile(multipartFile);
         fotoSarana.setFoto(image);
+        fotoSarana.setUserId(securityUtil.getCurrentUserId());
+        fotoSarana.setUserName(securityUtil.getCurrentUsername());
         fotoSarana.setSarana(saranaRepository.findById(fotoSaranaDTO.getId_sarana()).orElse(null));
         return fotoSaranaRepository.save(fotoSarana);
     }
@@ -58,21 +65,32 @@ public class FotoSaranaService {
     public Page<FotoSarana> getAll(Pageable pageable){
         return fotoSaranaRepository.findAll(pageable);
     }
+     public Page<FotoSarana> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return fotoSaranaRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
     public Page<FotoSarana> getAllTerbaru(Pageable pageable) {
         return fotoSaranaRepository.getAll(pageable);
     }
-    public Page<FotoSarana> getAllBySarana(Long id ,Pageable pageable){
-        return fotoSaranaRepository.findBySaranaId(id,pageable);
+    public Page<FotoSarana> getAllBySarana(Long userId, Long id, Pageable pageable) {
+        return fotoSaranaRepository.findBySaranaIdAndUserId(id, userId, pageable);
     }
     public FotoSarana edit(FotoSaranaDTO fotoSarana, Long id) throws Exception {
         FotoSarana update = fotoSaranaRepository.findById(id).orElse(null);
         update.setSarana(saranaRepository.findById(fotoSarana.getId_sarana()).orElse(null));
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return fotoSaranaRepository.save(update);
     }
     public FotoSarana editFoto( MultipartFile multipartFile , Long id) throws Exception {
         FotoSarana update = fotoSaranaRepository.findById(id).orElse(null);
         String image = uploadFile(multipartFile);
         update.setFoto(image);
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return fotoSaranaRepository.save(update);
     }
 
@@ -97,7 +115,7 @@ public class FotoSaranaService {
     }
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

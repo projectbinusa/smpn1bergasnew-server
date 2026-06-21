@@ -3,7 +3,9 @@ package com.smpn1.bergas.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.model.Alumni;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.repository.AlumniRepository;
+import com.smpn1.bergas.util.SecurityUtil;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
@@ -33,13 +35,22 @@ import java.util.Map;
 
 @Service
 public class AlumniService {
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
 
-//    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
+    // private static final String DOWNLOAD_URL =
+    // "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
     @Autowired
     AlumniRepository alumniRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public Alumni add(Alumni alumni) throws Exception {
+        alumni.setUserId(
+                securityUtil.getCurrentUserId());
+
+        alumni.setUserName(
+                securityUtil.getCurrentUsername());
         return alumniRepository.save(alumni);
     }
 
@@ -50,8 +61,17 @@ public class AlumniService {
     public Page<Alumni> getAll(Pageable pageable) {
         return alumniRepository.findAll(pageable);
     }
-    public Page<Alumni> getAllTerbaru(Pageable pageable) {
-        return alumniRepository.getAll(pageable);
+
+    public Page<Alumni> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return alumniRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
+
+    public Page<Alumni> getAllTerbaru(Long userId, Pageable pageable) {
+        return alumniRepository.findByUserIdOrderByCreatedDateDesc(userId, pageable);
     }
 
     public Alumni edit(Alumni alumni, Long id) throws Exception {
@@ -62,12 +82,13 @@ public class AlumniService {
             update.setKontak(alumni.getKontak());
             update.setProfesi(alumni.getProfesi());
             update.setTahunLulus(alumni.getTahunLulus());
-//            update.setNip(alumni.getNip());
-//            update.setRiwayat(alumni.getRiwayat());
+            // update.setNip(alumni.getNip());
+            // update.setRiwayat(alumni.getRiwayat());
             return alumniRepository.save(update);
         }
         return null;
     }
+
     public Alumni editFoto(MultipartFile multipartFile, Long id) throws Exception {
         Alumni update = alumniRepository.findById(id).orElse(null);
         if (update != null) {
@@ -89,18 +110,19 @@ public class AlumniService {
         }
     }
 
-//    private String imageConverter(MultipartFile multipartFile) throws Exception {
-//        try {
-//            String fileName = getFileNameWithExtension(multipartFile.getOriginalFilename());
-//            File file = convertFile(multipartFile, fileName);
-//            String responseUrl = uploadFile(file, fileName);
-//            file.delete();
-//            return responseUrl;
-//        } catch (Exception e) {
-//            e.printStackTrace(); // Memperbaiki pencetakan stack trace
-//            throw new Exception("Error upload file: " + e.getMessage());
-//        }
-//    }
+    // private String imageConverter(MultipartFile multipartFile) throws Exception {
+    // try {
+    // String fileName =
+    // getFileNameWithExtension(multipartFile.getOriginalFilename());
+    // File file = convertFile(multipartFile, fileName);
+    // String responseUrl = uploadFile(file, fileName);
+    // file.delete();
+    // return responseUrl;
+    // } catch (Exception e) {
+    // e.printStackTrace(); // Memperbaiki pencetakan stack trace
+    // throw new Exception("Error upload file: " + e.getMessage());
+    // }
+    // }
 
     private String getFileNameWithExtension(String fileName) {
         return fileName != null && fileName.contains(".") ? fileName : null;
@@ -113,6 +135,7 @@ public class AlumniService {
         }
         return file;
     }
+
     private String extractFileUrlFromResponse(String responseBody) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonResponse = mapper.readTree(responseBody);
@@ -124,7 +147,7 @@ public class AlumniService {
 
     private String uploadFIle(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -136,20 +159,26 @@ public class AlumniService {
         return fileUrl;
     }
 
-//    private String uploadFile(File file, String fileName) throws IOException {
-//        BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com", fileName);
-//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build(); // Sesuaikan content type
-//
-//        // Pastikan file `bawaslu-firebase.json` ada di classpath
-//        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
-//        if (serviceAccount == null) {
-//            throw new IOException("Service account file not found");
-//        }
-//
-//        Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
-//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-//        storage.create(blobInfo, Files.readAllBytes(file.toPath()));
-//
-//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
-//    }
+    // private String uploadFile(File file, String fileName) throws IOException {
+    // BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com",
+    // fileName);
+    // BlobInfo blobInfo =
+    // BlobInfo.newBuilder(blobId).setContentType("media").build(); // Sesuaikan
+    // content type
+    //
+    // // Pastikan file `bawaslu-firebase.json` ada di classpath
+    // InputStream serviceAccount =
+    // getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
+    // if (serviceAccount == null) {
+    // throw new IOException("Service account file not found");
+    // }
+    //
+    // Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
+    // Storage storage =
+    // StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+    // storage.create(blobInfo, Files.readAllBytes(file.toPath()));
+    //
+    // return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName,
+    // StandardCharsets.UTF_8));
+    // }
 }

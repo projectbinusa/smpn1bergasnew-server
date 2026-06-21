@@ -10,6 +10,7 @@ import com.smpn1.bergas.model.FotoSarana;
 import com.smpn1.bergas.model.Kegiatan;
 import com.smpn1.bergas.repository.FotoKegiatanRepository;
 import com.smpn1.bergas.repository.KegiatanRepository;
+import com.smpn1.bergas.util.SecurityUtil;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
@@ -43,11 +44,16 @@ public class KegiatanService {
     @Autowired
     private FotoKegiatanRepository fotoKegiatanRepository;
 
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+    @Autowired
+    private SecurityUtil securityUtil;
+
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
 
     public Kegiatan add(Kegiatan kegiatan) throws Exception {
+        kegiatan.setUserId(securityUtil.getCurrentUserId());
+        kegiatan.setUserName(securityUtil.getCurrentUsername());
         return kegiatanRepository.save(kegiatan);
     }
 
@@ -55,8 +61,15 @@ public class KegiatanService {
         return kegiatanRepository.findById(id).orElse(null);
     }
 
-    public Page<Kegiatan> getAll(Pageable pageable) {
-        return kegiatanRepository.findAll(pageable);
+    public Page<Kegiatan> getAll(Long userId, Pageable pageable) {
+        return kegiatanRepository.findByUserId(userId, pageable);
+    }
+    public Page<Kegiatan> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return kegiatanRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
     }
     public Page<Kegiatan> getAllTerbaru(Pageable pageable) {
         return kegiatanRepository.getAll(pageable);
@@ -104,6 +117,9 @@ public class KegiatanService {
         update.setIsi(kegiatan.getIsi());
         update.setPenulis(kegiatan.getPenulis());
         update.setTanggal(kegiatan.getTanggal());
+        // update.setCategory(kegiatan.getCategory());
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return kegiatanRepository.save(update);
     }
     public Kegiatan editFoto(Long id, MultipartFile multipartFile) throws Exception {
@@ -124,7 +140,7 @@ public class KegiatanService {
 
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

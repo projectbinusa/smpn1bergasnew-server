@@ -2,9 +2,13 @@ package com.smpn1.bergas.controller;
 
 
 import com.smpn1.bergas.DTO.ProgramDTO;
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Program;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.ProgramService;
+import com.smpn1.bergas.util.DomainUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,12 +20,22 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Sort;
+
 @RestController
 @RequestMapping("/api/program")
 @CrossOrigin(origins = "*")
 public class ProgramController {
     @Autowired
     private ProgramService programService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private DomainUtil domainUtil;
 
     @PostMapping(path = "/add")
     public ResponseEntity<CommonResponse<Program>> add(@RequestBody ProgramDTO program) throws SQLException, ClassNotFoundException {
@@ -62,6 +76,47 @@ public class ProgramController {
             response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
             response.setData(null);
             response.setMessage("Failed to retrieve guru list: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+     @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<Program>>> listAllProgram(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<Program>> response = new CommonResponse<>();
+
+        try {
+            Page<Program> programPage = programService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(programPage);
+            response.setMessage("Program list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve program list: " + e.getMessage());
+
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -134,16 +189,24 @@ public class ProgramController {
     }
     @GetMapping(path = "/get/judul")
     public ResponseEntity<CommonResponse<Page<Program>>> getByJudul(
+            HttpServletRequest request,
             @RequestParam(name = "judul_program") String judul,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
 
         CommonResponse<Page<Program>> response = new CommonResponse<>();
         try {
-            Page<Program> beritaPage = programService.getByJudul(judul, pageable);
+            Long userId = domainUtil.getCurrentUserId(request);
+            Page<Program> beritaPage = programService.getByJudul(userId,judul, pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);

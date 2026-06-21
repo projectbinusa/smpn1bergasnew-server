@@ -6,6 +6,7 @@ import com.smpn1.bergas.DTO.KeuanganDTO;
 import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Keuangan;
 import com.smpn1.bergas.repository.KeuanganRepository;
+import com.smpn1.bergas.util.SecurityUtil;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
@@ -38,7 +39,10 @@ public class KeuanganService {
     @Autowired
     private KeuanganRepository keuanganRepository;
 
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+    @Autowired
+    private SecurityUtil securityUtil;
+
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
 
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
@@ -48,7 +52,8 @@ public class KeuanganService {
         newKeuangan.setJudul(keuangan.getJudul());
         newKeuangan.setIsi(keuangan.getIsi());
         newKeuangan.setCategoryKeuangan(keuangan.getCategory());
-
+        newKeuangan.setUserId(securityUtil.getCurrentUserId());
+        newKeuangan.setUserName(securityUtil.getCurrentUsername());
         return keuanganRepository.save(newKeuangan);
     }
 
@@ -58,6 +63,13 @@ public class KeuanganService {
 
     public Page<Keuangan> getAll(Pageable pageable) {
         return keuanganRepository.findAll(pageable);
+    }
+    public Page<Keuangan> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return keuanganRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
     }
     public Page<Keuangan> getAllTerbaru(Pageable pageable) {
         return keuanganRepository.getAll(pageable);
@@ -79,6 +91,8 @@ public class KeuanganService {
         keuangan.setJudul(keuanganDTO.getJudul());
         keuangan.setIsi(keuanganDTO.getIsi());
         keuangan.setCategoryKeuangan(keuanganDTO.getCategory());
+        keuangan.setUserId(securityUtil.getCurrentUserId());
+        keuangan.setUserName(securityUtil.getCurrentUsername());
 
         return keuanganRepository.save(keuangan);
     }
@@ -89,8 +103,8 @@ public class KeuanganService {
         return keuanganRepository.save(keuangan);
     }
 
-    public Page<Keuangan> getByCategory(String categoryId, Pageable pageable) {
-        return keuanganRepository.findByCategoryKeuangan_Id(categoryId, pageable);
+    public Page<Keuangan> getByCategory(Long userId, String categoryId, Pageable pageable) {
+        return keuanganRepository.findByUserIdAndCategoryKeuangan_Id(userId, categoryId, pageable);
     }
 
     private String extractFileUrlFromResponse(String responseBody) throws IOException {
@@ -104,7 +118,7 @@ public class KeuanganService {
 
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

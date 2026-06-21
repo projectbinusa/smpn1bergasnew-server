@@ -9,4 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface KontakRespository extends JpaRepository<Kontak , Long> {
     @Query(value = "SELECT * FROM kontak ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Kontak> getAll(Pageable pageable);
+
+    Page<Kontak> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
 }

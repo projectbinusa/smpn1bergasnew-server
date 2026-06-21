@@ -2,6 +2,8 @@ package com.smpn1.bergas.model;
 
 import com.smpn1.bergas.auditing.DateConfig;
 
+
+
 import javax.persistence.*;
 
 @Entity
@@ -24,8 +26,16 @@ public class Struktur extends DateConfig {
     @Column(name = "foto_anggota")
     private String foto;
 
-//    @Column(name = "jenis")
-//    private String jenisStruktur;
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
+
+
+    // @Column(name = "jenis")
+    // private String jenisStruktur;
 
     public Long getId() {
         return id;
@@ -67,11 +77,27 @@ public class Struktur extends DateConfig {
         this.foto = foto;
     }
 
-//    public String getJenisStruktur() {
-//        return jenisStruktur;
-//    }
-//
-//    public void setJenisStruktur(String jenisStruktur) {
-//        this.jenisStruktur = jenisStruktur;
-//    }
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+   public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    // public String getJenisStruktur() {
+    // return jenisStruktur;
+    // }
+    //
+    // public void setJenisStruktur(String jenisStruktur) {
+    // this.jenisStruktur = jenisStruktur;
+    // }
 }

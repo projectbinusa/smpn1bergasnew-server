@@ -2,6 +2,8 @@ package com.smpn1.bergas.model;
 
 import com.smpn1.bergas.auditing.DateConfig;
 
+
+
 import javax.persistence.*;
 
 @Entity
@@ -16,6 +18,14 @@ public class KondisiSekolah extends DateConfig {
 
     @Column(name = "deskripsi")
     private String deskripsi;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
+
 
     public Long getId() {
         return id;
@@ -39,5 +49,21 @@ public class KondisiSekolah extends DateConfig {
 
     public void setDeskripsi(String deskripsi) {
         this.deskripsi = deskripsi;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+   public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

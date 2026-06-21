@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,9 +24,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.CategoryGalery;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.CategoryGaleryService;
+import org.springframework.data.domain.Sort;
 
 @RestController
 @RequestMapping("/api/category_galery")
@@ -32,6 +37,9 @@ import com.smpn1.bergas.service.CategoryGaleryService;
 public class CategoryGaleryController {
     @Autowired
     private CategoryGaleryService categoryGaleryService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping(path = "/add")
     public ResponseEntity<CommonResponse<CategoryGalery>> add(@RequestBody CategoryGalery categoryprogram) throws SQLException, ClassNotFoundException {
@@ -119,6 +127,49 @@ public class CategoryGaleryController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+     @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<CategoryGalery>>> listAllCategoryGalery(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<CategoryGalery>> response = new CommonResponse<>();
+
+        try {
+            Page<CategoryGalery> categoryGaleryPage = categoryGaleryService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(categoryGaleryPage);
+            response.setMessage("CategoryGalery list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve category galery list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
     public ResponseEntity<CommonResponse<CategoryGalery>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
         CommonResponse<CategoryGalery> response = new CommonResponse<>();

@@ -2,6 +2,7 @@ package com.smpn1.bergas.model;
 
 import com.smpn1.bergas.auditing.DateConfig;
 
+
 import javax.persistence.*;
 
 @Entity
@@ -29,27 +30,35 @@ public class Alumni extends DateConfig {
     @Column(name = "kontak")
     private String kontak;
 
-//    @Column(name = "nip")
-//    private String nip;
-//
-//    @Column(name = "riwayat_pendidikan")
-//    private String riwayat;
+    @Column(name = "user_id")
+    private Long userId;
 
-//    public String getNip() {
-//        return nip;
-//    }
-//
-//    public void setNip(String nip) {
-//        this.nip = nip;
-//    }
-//
-//    public String getRiwayat() {
-//        return riwayat;
-//    }
-//
-//    public void setRiwayat(String riwayat) {
-//        this.riwayat = riwayat;
-//    }
+    @Column(name = "user_name")
+    private String userName;
+
+
+
+    // @Column(name = "nip")
+    // private String nip;
+    //
+    // @Column(name = "riwayat_pendidikan")
+    // private String riwayat;
+
+    // public String getNip() {
+    // return nip;
+    // }
+    //
+    // public void setNip(String nip) {
+    // this.nip = nip;
+    // }
+    //
+    // public String getRiwayat() {
+    // return riwayat;
+    // }
+    //
+    // public void setRiwayat(String riwayat) {
+    // this.riwayat = riwayat;
+    // }
 
     public String getTahunLulus() {
         return tahunLulus;
@@ -105,5 +114,21 @@ public class Alumni extends DateConfig {
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

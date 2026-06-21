@@ -8,6 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface OsisRepository extends JpaRepository<Osis, Long> {
-    @Query(value = "SELECT * FROM osis ORDER BY updated_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM osis ORDER BY updated_date DESC", nativeQuery = true)
     Page<Osis> getAll(Pageable pageable);
+
+    Page<Osis> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
 }

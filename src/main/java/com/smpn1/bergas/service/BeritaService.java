@@ -6,7 +6,9 @@ import com.google.cloud.storage.*;
 import com.smpn1.bergas.DTO.BeritaDTO;
 import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Galeri;
+import com.smpn1.bergas.model.UserModel;
 import com.smpn1.bergas.repository.BeritaRepository;
+import com.smpn1.bergas.repository.UserRepository;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,28 +37,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 @Service
 public class BeritaService {
 
     @Autowired
     private BeritaRepository beritaDao;
 
-
-
+    @Autowired
+    private UserRepository userRepository;
 
     private long id;
 
     public BeritaService() {
     }
 
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
 
-//    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
+    // private static final String DOWNLOAD_URL =
+    // "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
 
+    // public Berita add(Berita berita, MultipartFile[] files) throws Exception {
+    // List<String> uploadedUrls = new ArrayList<>();
+    // for (MultipartFile file : files) {
+    // String url = uploadFile(file);
+    // uploadedUrls.add(url);
+    // }
 
-    public Berita add(Berita berita, MultipartFile[] files) throws Exception {
+    // if (!uploadedUrls.isEmpty()) {
+    // berita.setImage(uploadedUrls.get(0));
+    // }
+
+    // return beritaDao.save(berita);
+    // }
+
+    public Berita add(
+            Berita berita,
+            MultipartFile[] files,
+            Long userId) throws Exception {
+
         List<String> uploadedUrls = new ArrayList<>();
+
         for (MultipartFile file : files) {
             String url = uploadFile(file);
             uploadedUrls.add(url);
@@ -66,10 +86,14 @@ public class BeritaService {
             berita.setImage(uploadedUrls.get(0));
         }
 
+        UserModel user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User tidak ditemukan"));
+
+        berita.setUserId(user.getId());
+        berita.setUserName(user.getUsername());
+
         return beritaDao.save(berita);
     }
-
-
 
     public Optional<Berita> findById(Long id) {
         return Optional.ofNullable(beritaDao.findById(id));
@@ -77,6 +101,14 @@ public class BeritaService {
 
     public Page<Berita> findAllWithPagination(Pageable pageable) {
         return beritaDao.findAllByOrderByUpdatedDateDesc(pageable);
+    }
+
+    public Page<Berita> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return beritaDao.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
     }
 
     @Transactional
@@ -100,6 +132,7 @@ public class BeritaService {
         berita.setCategoryBerita(beritaDTO.getCategory());
         return beritaDao.save(berita);
     }
+
     public Berita updateFoto(Long id, MultipartFile multipartFile) throws Exception {
         Berita berita = beritaDao.findById(id);
         String image = uploadFile(multipartFile);
@@ -107,9 +140,8 @@ public class BeritaService {
         return beritaDao.save(berita);
     }
 
-
-    public List<Berita> beritaTerbaru(){
-        return beritaDao.findFirst5ByOrderByUpdatedDateDesc();
+    public List<Berita> beritaTerbaru(Long userId) {
+        return beritaDao.findFirst5ByUserIdOrderByUpdatedDateDesc(userId);
     }
 
     public List<Berita> searchBerita(String judul) {
@@ -118,20 +150,30 @@ public class BeritaService {
 
     public Berita getBeritaById(Long id) throws Exception {
         Berita berita = beritaDao.findById(id);
-        if (berita == null) throw new Exception("Berita not found!!!");
+        if (berita == null)
+            throw new Exception("Berita not found!!!");
         return berita;
     }
 
-    public List<Berita> arsip(String bulan){
+    public List<Berita> arsip(String bulan) {
         return beritaDao.find(bulan);
     }
 
-
-
-
-    public Page<Berita> getByCategory(String categoryId, Pageable pageable) {
+    public Page<Berita> getByCategory(Long categoryId, Pageable pageable) {
         return beritaDao.findByCategoryBerita_Id(categoryId, pageable);
     }
+
+    public Page<Berita> getByCategoryAndUserId(
+            String categoryBerita,
+            Long userId,
+            Pageable pageable) {
+
+        return beritaDao.findByCategoryBeritaAndUserId(
+                categoryBerita,
+                userId,
+                pageable);
+    }
+
     public List<Berita> relatedPosts(Long idBerita) throws Exception {
         String berita = beritaDao.getByIdBerita(idBerita);
         return beritaDao.relatedPost(berita);
@@ -141,21 +183,21 @@ public class BeritaService {
         return beritaDao.terbaruByCategory(categoryId);
     }
 
-//    private String imageConverter(MultipartFile multipartFile) throws Exception {
-//        try {
-//            String fileName = getExtension(multipartFile.getOriginalFilename());
-//            File file = convertFile(multipartFile, fileName);
-//            var RESPONSE_URL = uploadFile(file, fileName);
-//            file.delete();
-//            return RESPONSE_URL;
-//        } catch (Exception e) {
-//            e.getStackTrace();
-//            throw new Exception("Error upload file: " + e.getMessage());
-//        }
-//    }
+    // private String imageConverter(MultipartFile multipartFile) throws Exception {
+    // try {
+    // String fileName = getExtension(multipartFile.getOriginalFilename());
+    // File file = convertFile(multipartFile, fileName);
+    // var RESPONSE_URL = uploadFile(file, fileName);
+    // file.delete();
+    // return RESPONSE_URL;
+    // } catch (Exception e) {
+    // e.getStackTrace();
+    // throw new Exception("Error upload file: " + e.getMessage());
+    // }
+    // }
 
     private String getExtension(String fileName) {
-        return  fileName.split("\\.")[0];
+        return fileName.split("\\.")[0];
     }
 
     private File convertFile(MultipartFile multipartFile, String fileName) throws IOException {
@@ -167,6 +209,7 @@ public class BeritaService {
         System.out.println("File size: " + file.length());
         return file;
     }
+
     private String extractFileUrlFromResponse(String responseBody) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonResponse = mapper.readTree(responseBody);
@@ -175,9 +218,10 @@ public class BeritaService {
 
         return urlFile;
     }
+
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         org.springframework.http.HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -189,14 +233,19 @@ public class BeritaService {
         return fileUrl;
     }
 
-//    private String uploadFile(File file, String fileName) throws IOException {
-//        BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com", fileName);
-//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-//        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
-//        Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
-//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-//        storage.create(blobInfo, Files.readAllBytes(file.toPath()));
-//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
-//    }
+    // private String uploadFile(File file, String fileName) throws IOException {
+    // BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com",
+    // fileName);
+    // BlobInfo blobInfo =
+    // BlobInfo.newBuilder(blobId).setContentType("media").build();
+    // InputStream serviceAccount =
+    // getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
+    // Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
+    // Storage storage =
+    // StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+    // storage.create(blobInfo, Files.readAllBytes(file.toPath()));
+    // return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName,
+    // StandardCharsets.UTF_8));
+    // }
 
 }

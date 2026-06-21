@@ -11,6 +11,8 @@ import com.google.cloud.storage.StorageOptions;
 import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Sambutan;
 import com.smpn1.bergas.repository.SambutanRepository;
+import com.smpn1.bergas.util.SecurityUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,9 +38,15 @@ import java.util.Map;
 public class SambutanService {
     @Autowired
     private SambutanRepository sambutanRepository;
+
+    @Autowired
+    private SecurityUtil securityUtil;
+
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-a0910.appspot.com/o/%s?alt=media";
 
     public Sambutan add(Sambutan sambutan ) throws Exception {
+        sambutan.setUserId(securityUtil.getCurrentUserId());
+        sambutan.setUserName(securityUtil.getCurrentUsername());
         return sambutanRepository.save(sambutan);
     }
     public Sambutan getById(Long id){
@@ -47,8 +55,15 @@ public class SambutanService {
     public Page<Sambutan> getAll(Pageable pageable){
         return sambutanRepository.findAll(pageable);
     }
-    public Page<Sambutan> getAllTerbaru(Pageable pageable) {
-        return sambutanRepository.getAll(pageable);
+    public Page<Sambutan> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return sambutanRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
+    public Page<Sambutan> getAllTerbaru(Long userId, Pageable pageable) {
+        return sambutanRepository.findByUserIdOrderByCreatedDateDesc(userId, pageable);
     }
     public Sambutan edit(Sambutan sambutan  , Long id) throws Exception {
         Sambutan update = sambutanRepository.findById(id).orElse(null);
@@ -56,6 +71,8 @@ public class SambutanService {
         update.setIsi(sambutan.getIsi());
         update.setNip(sambutan.getNip());
         update.setJudul(sambutan.getJudul());
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return sambutanRepository.save(update);
     }
     public Sambutan editFoto( MultipartFile multipartFile , Long id) throws Exception {
@@ -98,7 +115,7 @@ public class SambutanService {
 
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

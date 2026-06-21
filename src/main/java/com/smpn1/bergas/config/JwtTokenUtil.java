@@ -3,11 +3,16 @@ package com.smpn1.bergas.config;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.smpn1.bergas.model.UserModel;
+import com.smpn1.bergas.repository.UserRepository;
 
 import java.io.Serializable;
 import java.util.*;
@@ -23,12 +28,15 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String secret;
 
-    //retrieve username from jwt token
+    @Autowired
+    private UserRepository userRepository;
+
+    // retrieve username from jwt token
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
-    //retrieve expiration date from jwt token
+    // retrieve expiration date from jwt token
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
@@ -37,37 +45,56 @@ public class JwtTokenUtil implements Serializable {
         final Claims claims = getAllClaimsFromToken(token);
         return claimsResolver.apply(claims);
     }
-    //for retrieveing any information from token we will need the secret key
+
+    // for retrieveing any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
-    //check if the token has expired
+    // check if the token has expired
     private Boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());
     }
 
-    //generate token for user
+    // generate token for user
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+
         Collection<? extends GrantedAuthority> role = userDetails.getAuthorities();
 
-        if (role.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+        UserModel user = userRepository.findByUsername(
+                userDetails.getUsername());
+
+        claims.put("userId", user.getId());
+        claims.put("userName", user.getUsername());
+
+        if (role.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
             claims.put("isAdmin", true);
         }
 
-        if (role.contains(new SimpleGrantedAuthority("ROLE_USER"))){
+        if (role.contains(new SimpleGrantedAuthority("ROLE_USER"))) {
             claims.put("isUser", true);
         }
-        return doGenerateToken(claims, userDetails.getUsername());
+
+        return doGenerateToken(
+                claims,
+                userDetails.getUsername());
     }
 
-    //while creating the token -
-    //1. Define  claims of the token, like Issuer, Expiration, Subject, and the ID
-    //2. Sign the JWT using the HS512 algorithm and secret key.
-    //3. According to JWS Compact Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
-    //   compaction of the JWT to a URL-safe string
+    public Long getUserIdFromToken(String token) {
+        Claims claims = getAllClaimsFromToken(token);
+
+        return ((Number) claims.get("userId"))
+                .longValue();
+    }
+
+    // while creating the token -
+    // 1. Define claims of the token, like Issuer, Expiration, Subject, and the ID
+    // 2. Sign the JWT using the HS512 algorithm and secret key.
+    // 3. According to JWS Compact
+    // Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
+    // compaction of the JWT to a URL-safe string
     private String doGenerateToken(Map<String, Object> claims, String subject) {
 
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
@@ -75,7 +102,7 @@ public class JwtTokenUtil implements Serializable {
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
 
-    public List<SimpleGrantedAuthority> getRolesFromToken(String token){
+    public List<SimpleGrantedAuthority> getRolesFromToken(String token) {
         Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
 
         List<SimpleGrantedAuthority> roles = null;
@@ -93,8 +120,7 @@ public class JwtTokenUtil implements Serializable {
         return roles;
     }
 
-
-    //validate token
+    // validate token
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));

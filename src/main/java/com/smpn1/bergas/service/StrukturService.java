@@ -6,6 +6,7 @@ import com.smpn1.bergas.DTO.StrukturDTO;
 import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Struktur;
 import com.smpn1.bergas.repository.StrukturRepository;
+import com.smpn1.bergas.util.SecurityUtil;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
@@ -37,6 +38,9 @@ public class StrukturService {
     @Autowired
     private StrukturRepository strukturRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
 
     public Struktur add(Struktur struktur, MultipartFile[] files) throws Exception {
         List<String> uploadedUrls = new ArrayList<>();
@@ -48,6 +52,8 @@ public class StrukturService {
         if (!uploadedUrls.isEmpty()) {
             struktur.setFoto(uploadedUrls.get(0));
         }
+        struktur.setUserId(securityUtil.getCurrentUserId());
+        struktur.setUserName(securityUtil.getCurrentUsername());
 
         return strukturRepository.save(struktur);
     }
@@ -56,10 +62,16 @@ public class StrukturService {
         return strukturRepository.findById(id).orElse(null);
     }
 
-    public Page<Struktur> getAll(Pageable pageable) {
-        return strukturRepository.findAll(pageable);
+    public Page<Struktur> getAll(Long userId, Pageable pageable) {
+        return strukturRepository.findByUserIdOrderByCreatedDateDesc(userId, pageable);
     }
-
+     public Page<Struktur> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return strukturRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
     public Page<Struktur> getAllTerbaru(Pageable pageable) {
         return strukturRepository.getAll(pageable);
     }
@@ -105,7 +117,7 @@ public class StrukturService {
 
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

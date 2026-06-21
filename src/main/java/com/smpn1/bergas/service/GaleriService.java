@@ -24,9 +24,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Galeri;
 import com.smpn1.bergas.repository.CategoryGaleryRepository;
 import com.smpn1.bergas.repository.GaleriRepository;
+import com.smpn1.bergas.util.SecurityUtil;
 
 @Service
 public class GaleriService {
@@ -36,6 +38,10 @@ public class GaleriService {
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
     @Autowired
     private GaleriRepository galeriRepository;
+
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public Galeri add(Galeri galeri, MultipartFile[] files) throws Exception {
         List<String> uploadedUrls = new ArrayList<>();
         for (MultipartFile file : files) {
@@ -52,24 +58,38 @@ public class GaleriService {
 
         galeri.setCategoryGalery(
                 categoryGaleryRepository.findById(categoryId)
-                        .orElseThrow(() -> new IllegalArgumentException("Kategori galeri tidak ditemukan."))
-        );
+                        .orElseThrow(() -> new IllegalArgumentException("Kategori galeri tidak ditemukan.")));
+        galeri.setUserId(securityUtil.getCurrentUserId());
+        galeri.setUserName(securityUtil.getCurrentUsername());
         return galeriRepository.save(galeri);
     }
 
-    public Galeri getById(Long id){
+    public Galeri getById(Long id) {
         return galeriRepository.findById(id).orElse(null);
     }
-    public Page<Galeri> getAll(Pageable pageable){
+
+    public Page<Galeri> getAll(Pageable pageable) {
         return galeriRepository.findAll(pageable);
     }
+
+    public Page<Galeri> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return galeriRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
+
     public Page<Galeri> getAllTerbaru(Pageable pageable) {
         return galeriRepository.getAll(pageable);
     }
+
     public Galeri edit(Galeri galeri, Long id) throws Exception {
         Galeri update = galeriRepository.findById(id).orElse(null);
         update.setJudul(galeri.getJudul());
         update.setDeskripsi(galeri.getDeskripsi());
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         Long categoryId = galeri.getCategoryGalery() != null ? galeri.getCategoryGalery().getId() : null;
         if (categoryId == null) {
             throw new IllegalArgumentException("Kategori galeri tidak boleh kosong.");
@@ -77,13 +97,14 @@ public class GaleriService {
 
         update.setCategoryGalery(
                 categoryGaleryRepository.findById(categoryId)
-                        .orElseThrow(() -> new IllegalArgumentException("Kategori galeri tidak ditemukan."))
-        );
+                        .orElseThrow(() -> new IllegalArgumentException("Kategori galeri tidak ditemukan.")));
         return galeriRepository.save(update);
     }
+
     public Galeri editFoto(MultipartFile[] files, Long id) throws Exception {
         Galeri update = galeriRepository.findById(id).orElse(null);
-        if (update == null) throw new Exception("Data tidak ditemukan");
+        if (update == null)
+            throw new Exception("Data tidak ditemukan");
 
         List<String> uploadedUrls = new ArrayList<>();
         for (MultipartFile file : files) {
@@ -120,7 +141,7 @@ public class GaleriService {
 
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -132,45 +153,50 @@ public class GaleriService {
         return fileUrl;
     }
 
-    public Page<Galeri> findByIdCategory(Long categoryId, Pageable pageable) {
-        return galeriRepository.findByIdCategory(categoryId, pageable);
+    public Page<Galeri> findByIdCategory(Long categoryId, Long userId, Pageable pageable) {
+        return galeriRepository.findByCategoryIdAndUserId(categoryId, userId, pageable);
     }
 
+    // private String imageConverter(MultipartFile multipartFile) throws Exception {
+    // try {
+    // String fileName = getExtension(multipartFile.getOriginalFilename());
+    // File file = convertFile(multipartFile, fileName);
+    // var RESPONSE_URL = uploadFile(file, fileName);
+    // file.delete();
+    // return RESPONSE_URL;
+    // } catch (Exception e) {
+    // e.getStackTrace();
+    // throw new Exception("Error upload file: " + e.getMessage());
+    // }
+    // }
+    //
+    // private String getExtension(String fileName) {
+    // return fileName.split("\\.")[0];
+    // }
+    //
+    // private File convertFile(MultipartFile multipartFile, String fileName) throws
+    // IOException {
+    // File file = new File(fileName);
+    // try (FileOutputStream fos = new FileOutputStream(file)) {
+    // fos.write(multipartFile.getBytes());
+    // fos.close();
+    // }
+    // System.out.println("File size: " + file.length());
+    // return file;
+    // }
 
-//    private String imageConverter(MultipartFile multipartFile) throws Exception {
-//        try {
-//            String fileName = getExtension(multipartFile.getOriginalFilename());
-//            File file = convertFile(multipartFile, fileName);
-//            var RESPONSE_URL = uploadFile(file, fileName);
-//            file.delete();
-//            return RESPONSE_URL;
-//        } catch (Exception e) {
-//            e.getStackTrace();
-//            throw new Exception("Error upload file: " + e.getMessage());
-//        }
-//    }
-//
-//    private String getExtension(String fileName) {
-//        return  fileName.split("\\.")[0];
-//    }
-//
-//    private File convertFile(MultipartFile multipartFile, String fileName) throws IOException {
-//        File file = new File(fileName);
-//        try (FileOutputStream fos = new FileOutputStream(file)) {
-//            fos.write(multipartFile.getBytes());
-//            fos.close();
-//        }
-//        System.out.println("File size: " + file.length());
-//        return file;
-//    }
-
-//    private String uploadFile(File file, String fileName) throws IOException {
-//        BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com", fileName);
-//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-//        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
-//        Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
-//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-//        storage.create(blobInfo, Files.readAllBytes(file.toPath()));
-//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
-//    }
+    // private String uploadFile(File file, String fileName) throws IOException {
+    // BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com",
+    // fileName);
+    // BlobInfo blobInfo =
+    // BlobInfo.newBuilder(blobId).setContentType("media").build();
+    // InputStream serviceAccount =
+    // getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
+    // Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
+    // Storage storage =
+    // StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+    // storage.create(blobInfo, Files.readAllBytes(file.toPath()));
+    // return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName,
+    // StandardCharsets.UTF_8));
+    // }
 }

@@ -6,6 +6,7 @@ import com.google.cloud.storage.*;
 import com.smpn1.bergas.DTO.LaporanBospDTO;
 import com.smpn1.bergas.model.LaporanBosp;
 import com.smpn1.bergas.repository.LaporanBospRepository;
+import com.smpn1.bergas.util.SecurityUtil;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +40,23 @@ public class LaporanBospService {
     @Autowired
     private LaporanBospRepository laporanRepo;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     private long id;
 
     public LaporanBospService() {
     }
 
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
 
     //    private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
     public LaporanBosp save(LaporanBospDTO dto, MultipartFile[] multipartFiles) throws Exception {
         LaporanBosp laporan = new LaporanBosp();
         laporan.setNama(dto.getNama());
         laporan.setDeskripsi(dto.getDeskripsi());
+        laporan.setUserId(securityUtil.getCurrentUserId());
+        laporan.setUserName(securityUtil.getCurrentUsername());
 
         if (multipartFiles != null && multipartFiles.length > 0) {
             String[] fileUrls = new String[multipartFiles.length];
@@ -71,6 +77,14 @@ public class LaporanBospService {
         return laporanRepo.findAllByOrderByUpdatedDateDesc(pageable);
     }
 
+    public Page<LaporanBosp> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return laporanRepo.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
+
     @Transactional
     public void delete(Long id) {
         Optional<LaporanBosp> laporanOpt = laporanRepo.findById(id);
@@ -88,6 +102,8 @@ public class LaporanBospService {
             LaporanBosp laporan = laporanOpt.get();
             laporan.setNama(dto.getNama());
             laporan.setDeskripsi(dto.getDeskripsi());
+            laporan.setUserId(securityUtil.getCurrentUserId());
+            laporan.setUserName(securityUtil.getCurrentUsername());
 
             if (multipartFiles != null && multipartFiles.length > 0) {
                 String[] fileUrls = new String[multipartFiles.length];
@@ -173,8 +189,8 @@ public class LaporanBospService {
      }
      private String uploadFile(MultipartFile multipartFile) throws IOException {
          RestTemplate restTemplate = new RestTemplate();
-         // String base_url = "https://s3.lynk2.co/api/s3/slbc/images";
-         String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+         // String base_url = "https://s3.byrtagihan.com/api/s3/slbc/images";
+         String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
          org.springframework.http.HttpHeaders headers = new HttpHeaders();
          headers.setContentType(MediaType.MULTIPART_FORM_DATA);
          MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

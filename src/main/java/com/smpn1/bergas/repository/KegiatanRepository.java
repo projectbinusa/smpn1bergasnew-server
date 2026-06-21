@@ -8,13 +8,22 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.Date;
 
-public interface KegiatanRepository extends JpaRepository<Kegiatan , Long> {
-    @Query(value = "SELECT * FROM kegiatan ORDER BY updated_date DESC" ,nativeQuery = true)
+public interface KegiatanRepository extends JpaRepository<Kegiatan, Long> {
+    @Query(value = "SELECT * FROM kegiatan ORDER BY updated_date DESC", nativeQuery = true)
     Page<Kegiatan> getAll(Pageable pageable);
 
     @Query(value = "SELECT * FROM kegiatan WHERE category = :category", nativeQuery = true)
-    Page<Kegiatan> getByCategory(String category , Pageable pageable);
+    Page<Kegiatan> getByCategory(String category, Pageable pageable);
 
     @Query(value = "SELECT * FROM kegiatan WHERE tanggal = :tanggal", nativeQuery = true)
-    Page<Kegiatan> getByTanggal(Date tanggal , Pageable pageable);
+    Page<Kegiatan> getByTanggal(Date tanggal, Pageable pageable);
+
+    Page<Kegiatan> findByUserId(
+            Long userId,
+            Pageable pageable);
+
+    Page<Kegiatan> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
+
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.model.Osis;
 import com.smpn1.bergas.repository.OsisRepository;
+import com.smpn1.bergas.util.SecurityUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +28,12 @@ public class OsisService {
     @Autowired
     private OsisRepository osisRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public Osis add(Osis osis) throws Exception {
+        osis.setUserId(securityUtil.getCurrentUserId());
+        osis.setUserName(securityUtil.getCurrentUsername());
         return osisRepository.save(osis);
     }
 
@@ -37,8 +44,15 @@ public class OsisService {
     public Page<Osis> getAll(Pageable pageable) {
         return osisRepository.findAll(pageable);
     }
-    public Page<Osis> getAllTerbaru(Pageable pageable) {
-        return osisRepository.getAll(pageable);
+    public Page<Osis> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return osisRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
+    public Page<Osis> getAllTerbaru(Long userId, Pageable pageable) {
+        return osisRepository.findByUserIdOrderByUpdatedDateDesc(userId, pageable);
     }
 
     public Osis edit(Osis osis, Long id) throws Exception {
@@ -49,6 +63,8 @@ public class OsisService {
             update.setKelas(osis.getKelas());
             update.setTahunJabat(osis.getTahunJabat());
             update.setTahunTuntas(osis.getTahunTuntas());
+            update.setUserId(securityUtil.getCurrentUserId());
+            update.setUserName(securityUtil.getCurrentUsername());
             return osisRepository.save(update);
         }
         return null;
@@ -97,7 +113,7 @@ public class OsisService {
 
     private String uploadFIle(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

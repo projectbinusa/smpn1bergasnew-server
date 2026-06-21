@@ -1,8 +1,12 @@
 package com.smpn1.bergas.controller;
 
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.CategoryProgram;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.CategoryProgramService;
+import com.smpn1.bergas.util.DomainUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +19,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Sort;
+
 @RestController
 @RequestMapping("/api/category_program")
 @CrossOrigin(origins = "*")
@@ -22,8 +30,15 @@ public class CategoryProgramController {
     @Autowired
     private CategoryProgramService categoryprogramService;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private DomainUtil domainUtil;
+
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<CategoryProgram>> add(@RequestBody CategoryProgram categoryprogram) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<CategoryProgram>> add(@RequestBody CategoryProgram categoryprogram)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<CategoryProgram> response = new CommonResponse<>();
         try {
             CategoryProgram categoryprogram1 = categoryprogramService.add(categoryprogram);
@@ -40,11 +55,11 @@ public class CategoryProgramController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping(path = "/all")
     public ResponseEntity<CommonResponse<Page<CategoryProgram>>> listAllCategoryProgram(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -64,9 +79,51 @@ public class CategoryProgramController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<CategoryProgram>>> listAllCategoryProgram(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<CategoryProgram>> response = new CommonResponse<>();
+
+        try {
+            Page<CategoryProgram> beritaPage = categoryprogramService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage("CategoryProgram list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve category program list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping(path = "/all/no_page")
-    public ResponseEntity<CommonResponse<List<CategoryProgram>>> getAllCategoryProgram(
-    ) {
+    public ResponseEntity<CommonResponse<List<CategoryProgram>>> getAllCategoryProgram() {
 
         CommonResponse<List<CategoryProgram>> response = new CommonResponse<>();
         try {
@@ -84,17 +141,26 @@ public class CategoryProgramController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<CategoryProgram>>> listAllCategoryProgramTerbaru(
+            HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
 
         CommonResponse<Page<CategoryProgram>> response = new CommonResponse<>();
         try {
-            Page<CategoryProgram> beritaPage = categoryprogramService.getAllTerbaru(pageable);
+            Long userId = domainUtil.getCurrentUserId(request);
+            Page<CategoryProgram> beritaPage = categoryprogramService.getAllTerbaru(userId, pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
@@ -108,8 +174,10 @@ public class CategoryProgramController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public ResponseEntity<CommonResponse<CategoryProgram>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<CategoryProgram>> get(@PathVariable("id") long id)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<CategoryProgram> response = new CommonResponse<>();
         try {
             CategoryProgram categoryBerita = categoryprogramService.getById(id);
@@ -126,8 +194,10 @@ public class CategoryProgramController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping(path = "/put/{id}", produces = "application/json")
-    public ResponseEntity<CommonResponse<CategoryProgram>> updateCategoryProgram(@PathVariable("id") Long id, @RequestBody CategoryProgram categoryprogram) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<CategoryProgram>> updateCategoryProgram(@PathVariable("id") Long id,
+            @RequestBody CategoryProgram categoryprogram) throws SQLException, ClassNotFoundException {
         CommonResponse<CategoryProgram> response = new CommonResponse<>();
         try {
             CategoryProgram tabelDip = categoryprogramService.edit(categoryprogram, id);
@@ -144,6 +214,7 @@ public class CategoryProgramController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> delete(@PathVariable("id") Long id) {
         return ResponseEntity.ok(categoryprogramService.delete(id));

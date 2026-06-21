@@ -9,4 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 public interface SambutanRepository extends JpaRepository<Sambutan , Long> {
     @Query(value = "SELECT * FROM sambutan ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Sambutan> getAll(Pageable pageable);
+
+    Page<Sambutan> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
+
+    Page<Sambutan> findByUserIdOrderByCreatedDateDesc(
+            Long userId,
+            Pageable pageable);
 }

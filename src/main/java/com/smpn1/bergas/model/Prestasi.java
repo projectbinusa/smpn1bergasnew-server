@@ -1,10 +1,12 @@
 package com.smpn1.bergas.model;
 
 import com.smpn1.bergas.auditing.DateConfig;
+
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(name = "prestasi")
@@ -16,7 +18,7 @@ public class Prestasi extends DateConfig {
     @Column(name = "judul")
     private String judul;
 
-    @JsonFormat(pattern = "yyyy/MM/dd" , timezone = "Asia/Jakarta")
+    @JsonFormat(pattern = "yyyy/MM/dd", timezone = "Asia/Jakarta")
     @Column(name = "tanggal")
     private Date tanggal;
 
@@ -32,6 +34,14 @@ public class Prestasi extends DateConfig {
     @Lob
     @Column(name = "foto")
     private String foto;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
+
 
     public Long getId() {
         return id;
@@ -87,5 +97,21 @@ public class Prestasi extends DateConfig {
 
     public void setFoto(String foto) {
         this.foto = foto;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+   public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

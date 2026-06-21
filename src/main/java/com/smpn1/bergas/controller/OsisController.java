@@ -1,8 +1,12 @@
 package com.smpn1.bergas.controller;
 
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Osis;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.OsisService;
+import com.smpn1.bergas.util.DomainUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Sort;
+
 @RestController
 @RequestMapping("/api/osis")
 @CrossOrigin(origins = "*")
@@ -22,9 +30,15 @@ public class OsisController {
     @Autowired
     private OsisService osisService;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private DomainUtil domainUtil;
 
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Osis>> add(@RequestBody Osis osis) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Osis>> add(@RequestBody Osis osis)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Osis> response = new CommonResponse<>();
         try {
             Osis prestasi1 = osisService.add(osis);
@@ -45,8 +59,7 @@ public class OsisController {
     @GetMapping(path = "/all")
     public ResponseEntity<CommonResponse<Page<Osis>>> listAllOsis(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -67,17 +80,63 @@ public class OsisController {
         }
     }
 
+    @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<Osis>>> listAllOsis(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<Osis>> response = new CommonResponse<>();
+
+        try {
+            Page<Osis> osisPage = osisService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(osisPage);
+            response.setMessage("Osis list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve osis list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<Osis>>> listAllOsisTerbaru(
+            HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder
     ) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Long userId = domainUtil.getCurrentUserId(request);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
 
         CommonResponse<Page<Osis>> response = new CommonResponse<>();
         try {
-            Page<Osis> beritaPage = osisService.getAllTerbaru(pageable);
+            Page<Osis> beritaPage = osisService.getAllTerbaru(userId, pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
@@ -93,7 +152,8 @@ public class OsisController {
     }
 
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public ResponseEntity<CommonResponse<Osis>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Osis>> get(@PathVariable("id") long id)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Osis> response = new CommonResponse<>();
         try {
             Osis categoryBerita = osisService.getById(id);
@@ -111,9 +171,10 @@ public class OsisController {
         }
     }
 
-    //    @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
+    // @PutMapping(path = "/put/{id}", consumes = "multipart/form-data")
     @PutMapping(path = "/put/{id}")
-    public ResponseEntity<CommonResponse<Osis>> updateOsis(@PathVariable("id") Long id,@RequestBody Osis prestasi) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Osis>> updateOsis(@PathVariable("id") Long id, @RequestBody Osis prestasi)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Osis> response = new CommonResponse<>();
         try {
             Osis tabelDip = osisService.edit(prestasi, id);
@@ -130,8 +191,10 @@ public class OsisController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Osis>> updateOsis(@PathVariable("id") Long id, @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Osis>> updateOsis(@PathVariable("id") Long id,
+            @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
         CommonResponse<Osis> response = new CommonResponse<>();
         try {
             Osis tabelDip = osisService.editFoto(multipartFile, id);

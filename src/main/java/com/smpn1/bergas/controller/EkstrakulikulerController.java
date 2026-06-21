@@ -1,9 +1,12 @@
 package com.smpn1.bergas.controller;
 
-
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Ekstrakurikuler;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.EkstrakurikulerService;
+import com.smpn1.bergas.util.DomainUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +20,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Sort;
+
 @RestController
 @RequestMapping("/api/ekstrakulikuler")
 @CrossOrigin(origins = "*")
@@ -24,11 +31,18 @@ public class EkstrakulikulerController {
     @Autowired
     private EkstrakurikulerService ekstrakurikulerService;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private DomainUtil domainUtil;
+
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Ekstrakurikuler>> add(@RequestBody Ekstrakurikuler ekstrakurikuler ) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Ekstrakurikuler>> add(@RequestBody Ekstrakurikuler ekstrakurikuler)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Ekstrakurikuler> response = new CommonResponse<>();
         try {
-            Ekstrakurikuler ekstrakurikuler1 = ekstrakurikulerService.add(ekstrakurikuler );
+            Ekstrakurikuler ekstrakurikuler1 = ekstrakurikulerService.add(ekstrakurikuler);
             response.setStatus("success");
             response.setCode(HttpStatus.CREATED.value());
             response.setData(ekstrakurikuler1);
@@ -42,6 +56,7 @@ public class EkstrakulikulerController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @RequestMapping(value = "/all", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<CommonResponse<Page<Ekstrakurikuler>>> listAlEkstrakurikuler(
             @RequestParam(defaultValue = "0") int page,
@@ -69,17 +84,68 @@ public class EkstrakulikulerController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<Ekstrakurikuler>>> listAllEkstrakurikuler(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<Ekstrakurikuler>> response = new CommonResponse<>();
+
+        try {
+            Page<Ekstrakurikuler> beritaPage = ekstrakurikulerService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(beritaPage);
+            response.setMessage("Berita list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve berita list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<Ekstrakurikuler>>> listAllEkstrakurikulerTerbaru(
+            HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
 
         CommonResponse<Page<Ekstrakurikuler>> response = new CommonResponse<>();
         try {
-            Page<Ekstrakurikuler> beritaPage = ekstrakurikulerService.getAllTerbaru(pageable);
+            Long userId = domainUtil.getCurrentUserId(request);
+            Page<Ekstrakurikuler> beritaPage = ekstrakurikulerService.getAllTerbaru(userId, pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
@@ -93,8 +159,10 @@ public class EkstrakulikulerController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public ResponseEntity<CommonResponse<Ekstrakurikuler>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Ekstrakurikuler>> get(@PathVariable("id") long id)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Ekstrakurikuler> response = new CommonResponse<>();
         try {
             Ekstrakurikuler categoryBerita = ekstrakurikulerService.getById(id);
@@ -111,8 +179,10 @@ public class EkstrakulikulerController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping(path = "/put/{id}")
-    public ResponseEntity<CommonResponse<Ekstrakurikuler>> updateEkstrakurikuler(@PathVariable("id") Long id, @RequestBody Ekstrakurikuler ekstrakurikuler) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Ekstrakurikuler>> updateEkstrakurikuler(@PathVariable("id") Long id,
+            @RequestBody Ekstrakurikuler ekstrakurikuler) throws SQLException, ClassNotFoundException {
         CommonResponse<Ekstrakurikuler> response = new CommonResponse<>();
         try {
             Ekstrakurikuler tabelDip = ekstrakurikulerService.edit(ekstrakurikuler, id);
@@ -129,11 +199,13 @@ public class EkstrakulikulerController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Ekstrakurikuler>> updateFoto(@PathVariable("id") Long id,@RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Ekstrakurikuler>> updateFoto(@PathVariable("id") Long id,
+            @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
         CommonResponse<Ekstrakurikuler> response = new CommonResponse<>();
         try {
-            Ekstrakurikuler tabelDip = ekstrakurikulerService.editFoto( id, multipartFile);
+            Ekstrakurikuler tabelDip = ekstrakurikulerService.editFoto(id, multipartFile);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(tabelDip);
@@ -147,6 +219,7 @@ public class EkstrakulikulerController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> delete(@PathVariable("id") Long id) {
         return ResponseEntity.ok(ekstrakurikulerService.delete(id));

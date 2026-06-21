@@ -10,10 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.CategoryGalery;
 import com.smpn1.bergas.model.Galeri;
 import com.smpn1.bergas.repository.CategoryGaleryRepository;
 import com.smpn1.bergas.repository.GaleriRepository;
+import com.smpn1.bergas.util.SecurityUtil;
 
 @Service
 public class CategoryGaleryService {
@@ -23,33 +25,56 @@ public class CategoryGaleryService {
     @Autowired
     private GaleriRepository galeriRepository;
 
-    public CategoryGalery add(CategoryGalery categoryGalery){
+    @Autowired
+    private SecurityUtil securityUtil;
+
+    public CategoryGalery add(CategoryGalery categoryGalery) {
+        categoryGalery.setUserId(
+                securityUtil.getCurrentUserId());
+
+        categoryGalery.setUserName(
+                securityUtil.getCurrentUsername());
         return categoryGaleryRepository.save(categoryGalery);
     }
-    public CategoryGalery getById(Long id){
+
+
+    public CategoryGalery getById(Long id) {
         return categoryGaleryRepository.findById(id).orElse(null);
     }
-    public Page<CategoryGalery> getAll(Pageable pageable){
+
+    public Page<CategoryGalery> getAll(Pageable pageable) {
         return categoryGaleryRepository.findAll(pageable);
     }
-    public List<CategoryGalery> getAllNoPage(){
+
+    public List<CategoryGalery> getAllNoPage() {
         return categoryGaleryRepository.findAll();
     }
+
     public Page<CategoryGalery> getAllTerbaru(Pageable pageable) {
         return categoryGaleryRepository.getAll(pageable);
     }
-    public CategoryGalery edit(CategoryGalery categoryGalery ,Long id){
+
+    public Page<CategoryGalery> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return categoryGaleryRepository.findByUserIdOrderByUpdatedDateDesc(userId, pageable);
+    }
+
+    public CategoryGalery edit(CategoryGalery categoryGalery, Long id) {
         CategoryGalery update = categoryGaleryRepository.findById(id).orElse(null);
         update.setCategory(categoryGalery.getCategory());
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return categoryGaleryRepository.save(update);
     }
+
     public Map<String, Boolean> delete(Long id) {
         try {
             // Cek apakah ada foto terkait dengan sarana yang akan dihapus
             if (!galeriRepository.findByIdCategory(id).isEmpty()) {
                 // Hapus semua entri foto terkait dengan id sarana
                 List<Galeri> galeries = galeriRepository.findByIdCategory(id);
-                for (Galeri galeri : galeries){
+                for (Galeri galeri : galeries) {
                     galeriRepository.deleteById(galeri.getId());
                 }
             }

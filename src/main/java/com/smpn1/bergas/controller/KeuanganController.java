@@ -1,11 +1,14 @@
 package com.smpn1.bergas.controller;
 
-
 import com.smpn1.bergas.DTO.KeuanganDTO;
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Keuangan;
 import com.smpn1.bergas.model.Keuangan;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.KeuanganService;
+import com.smpn1.bergas.util.DomainUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +21,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Sort;
+
 @RestController
 @RequestMapping("/api/keuangan")
 @CrossOrigin(origins = "*")
@@ -25,9 +32,15 @@ public class KeuanganController {
     @Autowired
     private KeuanganService keuanganService;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private DomainUtil domainUtil;
 
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Keuangan>> add(@RequestBody KeuanganDTO keuangan) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Keuangan>> add(@RequestBody KeuanganDTO keuangan)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Keuangan> response = new CommonResponse<>();
         try {
             Keuangan keuangan1 = keuanganService.add(keuangan);
@@ -44,11 +57,11 @@ public class KeuanganController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping(path = "/all")
     public ResponseEntity<CommonResponse<Page<Keuangan>>> listAllKeuangan(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -68,11 +81,53 @@ public class KeuanganController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<Keuangan>>> listAllKeuangan(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<Keuangan>> response = new CommonResponse<>();
+
+        try {
+            Page<Keuangan> keuanganPage = keuanganService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(keuanganPage);
+            response.setMessage("Keuangan list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve keuangan list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<Keuangan>>> listAllKeuanganTerbaru(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -92,18 +147,20 @@ public class KeuanganController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping(path = "/category")
     public ResponseEntity<CommonResponse<Page<Keuangan>>> getBycategory(
+            HttpServletRequest request,
             @RequestParam(name = "category") String kategory,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "desc") String sortOrder) {
 
-        Pageable pageable = PageRequest.of(page, size);
-
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Long userId = domainUtil.getCurrentUserId(request);
         CommonResponse<Page<Keuangan>> response = new CommonResponse<>();
         try {
-            Page<Keuangan> beritaPage = keuanganService.getByCategory(kategory, pageable);
+            Page<Keuangan> beritaPage = keuanganService.getByCategory(userId, kategory, pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
@@ -117,8 +174,10 @@ public class KeuanganController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public ResponseEntity<CommonResponse<Keuangan>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Keuangan>> get(@PathVariable("id") long id)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Keuangan> response = new CommonResponse<>();
         try {
             Keuangan categoryBerita = keuanganService.findById(id);
@@ -135,8 +194,10 @@ public class KeuanganController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping(path = "/put/{id}")
-    public ResponseEntity<CommonResponse<Keuangan>> updateKeuangan(@PathVariable("id") Long id, KeuanganDTO keuangan) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Keuangan>> updateKeuangan(@PathVariable("id") Long id, KeuanganDTO keuangan)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Keuangan> response = new CommonResponse<>();
         try {
             Keuangan tabelDip = keuanganService.edit(id, keuangan);
@@ -153,8 +214,10 @@ public class KeuanganController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping(path = "/put/foto/{id}", consumes = "multipart/form-data")
-    public ResponseEntity<CommonResponse<Keuangan>> updateKeuangan(@PathVariable("id") Long id,@RequestPart("file") MultipartFile multipartFile ) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Keuangan>> updateKeuangan(@PathVariable("id") Long id,
+            @RequestPart("file") MultipartFile multipartFile) throws SQLException, ClassNotFoundException {
         CommonResponse<Keuangan> response = new CommonResponse<>();
         try {
             Keuangan tabelDip = keuanganService.editFoto(id, multipartFile);
@@ -171,6 +234,7 @@ public class KeuanganController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> delete(@PathVariable("id") Long id) {
         return ResponseEntity.ok(keuanganService.delete(id));

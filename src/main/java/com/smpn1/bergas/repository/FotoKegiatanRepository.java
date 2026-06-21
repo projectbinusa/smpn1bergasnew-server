@@ -1,5 +1,6 @@
 package com.smpn1.bergas.repository;
 
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.FotoKegiatan;
 import com.smpn1.bergas.model.FotoSarana;
 import org.springframework.data.domain.Page;
@@ -9,14 +10,18 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface FotoKegiatanRepository extends JpaRepository<FotoKegiatan , Long> {
-    @Query(value = "SELECT * FROM foto_kegiatan WHERE kegiatan_id = :id" , nativeQuery = true)
-    Page<FotoKegiatan> findByKegiatanId(Long id , Pageable pageable);
+public interface FotoKegiatanRepository extends JpaRepository<FotoKegiatan, Long> {
+    @Query(value = "SELECT * FROM foto_kegiatan WHERE kegiatan_id = :id AND user_id = :userId", nativeQuery = true)
+    Page<FotoKegiatan> findByKegiatanIdAndUserId(Long id, Long userId, Pageable pageable);
 
-    @Query(value = "SELECT * FROM foto_kegiatan WHERE kegiatan_id = :id" , nativeQuery = true)
+    @Query(value = "SELECT * FROM foto_kegiatan WHERE kegiatan_id = :id", nativeQuery = true)
     List<FotoKegiatan> findByIdKegiatan(Long id);
 
-    @Query(value = "SELECT * FROM foto_kegiatan ORDER BY updated_date DESC" ,nativeQuery = true)
+    @Query(value = "SELECT * FROM foto_kegiatan ORDER BY updated_date DESC", nativeQuery = true)
     Page<FotoKegiatan> getAll(Pageable pageable);
+
+    Page<FotoKegiatan> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
 
 }

@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.model.Guru;
 import com.smpn1.bergas.model.TenagaKependidikan;
 import com.smpn1.bergas.repository.TenagaKependidikanRepository;
+import com.smpn1.bergas.util.SecurityUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,11 +24,16 @@ import java.util.Map;
 
 @Service
 public class TenagaKependidikanService {
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
     @Autowired
     private TenagaKependidikanRepository tenagaKependidikanRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public TenagaKependidikan add(TenagaKependidikan tenagaKependidikan ) throws Exception {
+        tenagaKependidikan.setUserId(securityUtil.getCurrentUserId());
+        tenagaKependidikan.setUserName(securityUtil.getCurrentUsername());
         return tenagaKependidikanRepository.save(tenagaKependidikan);
     }
     public TenagaKependidikan getById(Long id){
@@ -34,6 +41,13 @@ public class TenagaKependidikanService {
     }
     public Page<TenagaKependidikan> getAll(Pageable pageable){
         return tenagaKependidikanRepository.findAll(pageable);
+    }
+    public Page<TenagaKependidikan> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return tenagaKependidikanRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
     }
     public Page<TenagaKependidikan> getAllTerbaru(Pageable pageable) {
         return tenagaKependidikanRepository.getAll(pageable);
@@ -43,12 +57,16 @@ public class TenagaKependidikanService {
         update.setStatus(tenagaKependidikan.getStatus());
         update.setNama(tenagaKependidikan.getNama());
         update.setJabatan(tenagaKependidikan.getJabatan());
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return tenagaKependidikanRepository.save(update);
     }
     public TenagaKependidikan editFoto( MultipartFile multipartFile , Long id) throws Exception {
         TenagaKependidikan update = tenagaKependidikanRepository.findById(id).orElse(null);
         String image = uploadFile(multipartFile);
         update.setFoto(image);
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return tenagaKependidikanRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {
@@ -73,7 +91,7 @@ public class TenagaKependidikanService {
 
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

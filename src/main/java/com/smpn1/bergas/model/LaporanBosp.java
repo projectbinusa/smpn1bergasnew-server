@@ -10,6 +10,8 @@ import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import com.smpn1.bergas.auditing.DateConfig;
+
+
 import com.smpn1.bergas.util.StringArrayJsonConverter;
 
 @Entity
@@ -24,6 +26,14 @@ public class LaporanBosp extends DateConfig {
     @Lob
     @Column(name = "deskripsi")
     private String deskripsi;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
+
 
     @Lob
     @Column(name = "files")
@@ -61,4 +71,20 @@ public class LaporanBosp extends DateConfig {
     public void setFiles(String[] files) {
         this.files = files;
     }
+
+    public Long getUserId() {
+    return userId;
+}
+
+public void setUserId(Long userId) {
+    this.userId = userId;
+}
+
+public String getUserName() {
+    return userName;
+}
+
+public void setUserName(String userName) {
+    this.userName = userName;
+}
 }

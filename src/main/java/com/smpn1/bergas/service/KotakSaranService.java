@@ -3,6 +3,8 @@ package com.smpn1.bergas.service;
 import com.smpn1.bergas.DTO.KotakSaranDTO;
 import com.smpn1.bergas.model.KotakSaran;
 import com.smpn1.bergas.repository.KotakSaranRepository;
+import com.smpn1.bergas.util.SecurityUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,12 +19,17 @@ public class KotakSaranService {
     @Autowired
     private KotakSaranRepository kotakSaranRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public KotakSaran add(KotakSaranDTO kotakSaran){
         KotakSaran kotakSaran1 = new KotakSaran();
         kotakSaran1.setTelp(kotakSaran.getTlp());
         kotakSaran1.setPesan(kotakSaran.getPesan());
         kotakSaran1.setNama(kotakSaran.getNama());
         kotakSaran1.setEmail(kotakSaran.getEmail());
+        kotakSaran1.setUserId(securityUtil.getCurrentUserId());
+        kotakSaran1.setUserName(securityUtil.getCurrentUsername());
         return kotakSaranRepository.save(kotakSaran1);
     }
     public KotakSaran getById(Long id){
@@ -30,6 +37,13 @@ public class KotakSaranService {
     }
     public Page<KotakSaran> getAll(Pageable pageable){
         return kotakSaranRepository.findAll(pageable);
+    }
+    public Page<KotakSaran> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return kotakSaranRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
     }
     public Page<KotakSaran> getAllTerbaru(Pageable pageable) {
         return kotakSaranRepository.getAll(pageable);
@@ -40,6 +54,8 @@ public class KotakSaranService {
         update.setEmail(kotakSaran.getEmail());
         update.setPesan(kotakSaran.getPesan());
         update.setTelp(kotakSaran.getTelp());
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return kotakSaranRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {

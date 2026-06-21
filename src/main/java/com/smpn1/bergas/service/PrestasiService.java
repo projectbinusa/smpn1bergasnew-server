@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Prestasi;
 import com.smpn1.bergas.repository.PrestasiRepository;
+import com.smpn1.bergas.util.SecurityUtil;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
@@ -36,12 +37,15 @@ import java.util.Map;
 public class PrestasiService {
     @Autowired
     PrestasiRepository prestasiRepository;
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+
+    @Autowired
+    private SecurityUtil securityUtil;
+
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
 
-
-    public Prestasi add(Prestasi prestasi , MultipartFile multipartFile) throws Exception {
+    public Prestasi add(Prestasi prestasi, MultipartFile multipartFile) throws Exception {
         String foto = uploadFile(multipartFile);
         prestasi.setFoto(foto);
         prestasi.setJudul(prestasi.getJudul());
@@ -49,8 +53,11 @@ public class PrestasiService {
         prestasi.setSkala(prestasi.getSkala());
         prestasi.setNama_peserta(prestasi.getNama_peserta());
         prestasi.setTanggal(prestasi.getTanggal());
+        prestasi.setUserId(securityUtil.getCurrentUserId());
+        prestasi.setUserName(securityUtil.getCurrentUsername());
         return prestasiRepository.save(prestasi);
     }
+
     public Prestasi edit(Prestasi prestasi, Long id) throws Exception {
         Prestasi update = prestasiRepository.findById(id).orElse(null);
         update.setJudul(prestasi.getJudul());
@@ -58,25 +65,42 @@ public class PrestasiService {
         update.setSkala(prestasi.getSkala());
         update.setNama_peserta(prestasi.getNama_peserta());
         update.setTanggal(prestasi.getTanggal());
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return prestasiRepository.save(update);
     }
-    public Prestasi editFoto(MultipartFile multipartFile , Long id) throws Exception {
+
+    public Prestasi editFoto(MultipartFile multipartFile, Long id) throws Exception {
         Prestasi update = prestasiRepository.findById(id).orElse(null);
         String foto = uploadFile(multipartFile);
         update.setFoto(foto);
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return prestasiRepository.save(update);
     }
-    public Prestasi getByid(Long id){
+
+    public Prestasi getByid(Long id) {
         return prestasiRepository.findById(id).orElse(null);
     }
-    public Page<Prestasi> getAll(Pageable pageable){
+
+    public Page<Prestasi> getAll(Pageable pageable) {
         return prestasiRepository.findAll(pageable);
     }
-    public Page<Prestasi> getAllTerbaru(Pageable pageable) {
-        return prestasiRepository.getAll(pageable);
+
+    public Page<Prestasi> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return prestasiRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
     }
-    public Page<Prestasi> searchPrestasi(String keyword, Pageable pageable) {
-        return prestasiRepository.searchAll(keyword, pageable);
+
+    public Page<Prestasi> getAllTerbaru(Long userId, Pageable pageable) {
+        return prestasiRepository.findByUserIdOrderByUpdatedDateDesc(userId, pageable);
+    }
+
+    public Page<Prestasi> searchPrestasi(Long userId, String keyword, Pageable pageable) {
+        return prestasiRepository.searchByUserIdAndKeyword(userId, keyword, pageable);
     }
 
     public Map<String, Boolean> delete(Long id) {
@@ -101,7 +125,7 @@ public class PrestasiService {
 
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -112,40 +136,46 @@ public class PrestasiService {
         String fileUrl = extractFileUrlFromResponse(response.getBody());
         return fileUrl;
     }
-//    private String imageConverter(MultipartFile multipartFile) throws Exception {
-//        try {
-//            String fileName = getExtension(multipartFile.getOriginalFilename());
-//            File file = convertFile(multipartFile, fileName);
-//            var RESPONSE_URL = uploadFile(file, fileName);
-//            file.delete();
-//            return RESPONSE_URL;
-//        } catch (Exception e) {
-//            e.getStackTrace();
-//            throw new Exception("Error upload file: " + e.getMessage());
-//        }
-//    }
-//
-//    private String getExtension(String fileName) {
-//        return  fileName.split("\\.")[0];
-//    }
-//
-//    private File convertFile(MultipartFile multipartFile, String fileName) throws IOException {
-//        File file = new File(fileName);
-//        try (FileOutputStream fos = new FileOutputStream(file)) {
-//            fos.write(multipartFile.getBytes());
-//            fos.close();
-//        }
-//        System.out.println("File size: " + file.length());
-//        return file;
-//    }
-//
-//    private String uploadFile(File file, String fileName) throws IOException {
-//        BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com", fileName);
-//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-//        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
-//        Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
-//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-//        storage.create(blobInfo, Files.readAllBytes(file.toPath()));
-//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
-//    }
+    // private String imageConverter(MultipartFile multipartFile) throws Exception {
+    // try {
+    // String fileName = getExtension(multipartFile.getOriginalFilename());
+    // File file = convertFile(multipartFile, fileName);
+    // var RESPONSE_URL = uploadFile(file, fileName);
+    // file.delete();
+    // return RESPONSE_URL;
+    // } catch (Exception e) {
+    // e.getStackTrace();
+    // throw new Exception("Error upload file: " + e.getMessage());
+    // }
+    // }
+    //
+    // private String getExtension(String fileName) {
+    // return fileName.split("\\.")[0];
+    // }
+    //
+    // private File convertFile(MultipartFile multipartFile, String fileName) throws
+    // IOException {
+    // File file = new File(fileName);
+    // try (FileOutputStream fos = new FileOutputStream(file)) {
+    // fos.write(multipartFile.getBytes());
+    // fos.close();
+    // }
+    // System.out.println("File size: " + file.length());
+    // return file;
+    // }
+    //
+    // private String uploadFile(File file, String fileName) throws IOException {
+    // BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com",
+    // fileName);
+    // BlobInfo blobInfo =
+    // BlobInfo.newBuilder(blobId).setContentType("media").build();
+    // InputStream serviceAccount =
+    // getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
+    // Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
+    // Storage storage =
+    // StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+    // storage.create(blobInfo, Files.readAllBytes(file.toPath()));
+    // return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName,
+    // StandardCharsets.UTF_8));
+    // }
 }

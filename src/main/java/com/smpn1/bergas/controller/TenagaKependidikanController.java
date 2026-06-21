@@ -1,6 +1,8 @@
 package com.smpn1.bergas.controller;
 
 
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.TenagaKependidikan;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.TenagaKependidikanService;
@@ -16,12 +18,20 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Sort;
+
 @RestController
 @RequestMapping("/api/tenaga_kependidikan")
 @CrossOrigin(origins = "*")
 public class TenagaKependidikanController {
     @Autowired
     private TenagaKependidikanService tenagaKependidikanService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
     @PostMapping(path = "/add")
     public ResponseEntity<CommonResponse<TenagaKependidikan>> add(@RequestBody TenagaKependidikan tenaga) throws SQLException, ClassNotFoundException {
         CommonResponse<TenagaKependidikan> response = new CommonResponse<>();
@@ -64,8 +74,49 @@ public class TenagaKependidikanController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+     @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<TenagaKependidikan>>> listAllTenagaKependidikan(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<TenagaKependidikan>> response = new CommonResponse<>();
+
+        try {
+            Page<TenagaKependidikan> tenagaKependidikanPage = tenagaKependidikanService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(tenagaKependidikanPage);
+            response.setMessage("Tenaga Kependidikan list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve tenaga kependidikan list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping(path = "/all/terbaru")
-    public ResponseEntity<CommonResponse<Page<TenagaKependidikan>>> listAllAlumniTerbaru(
+    public ResponseEntity<CommonResponse<Page<TenagaKependidikan>>> listAllTenagaKependidikanTerbaru(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {

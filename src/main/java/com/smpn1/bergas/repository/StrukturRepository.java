@@ -8,10 +8,19 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface StrukturRepository extends JpaRepository<Struktur , Long> {
-    @Query(value = "SELECT * FROM struktur WHERE jenis = :id AND ORDER BY update_date DESC" , nativeQuery = true)
-    Page<Struktur> findByJenisId(String id , Pageable pageable);
-    @Query(value = "SELECT * FROM struktur ORDER BY updated_date DESC" ,nativeQuery = true)
+public interface StrukturRepository extends JpaRepository<Struktur, Long> {
+    @Query(value = "SELECT * FROM struktur WHERE jenis = :id AND ORDER BY update_date DESC", nativeQuery = true)
+    Page<Struktur> findByJenisId(String id, Pageable pageable);
+
+    @Query(value = "SELECT * FROM struktur ORDER BY updated_date DESC", nativeQuery = true)
     Page<Struktur> getAll(Pageable pageable);
+
+    Page<Struktur> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
+
+    Page<Struktur> findByUserIdOrderByCreatedDateDesc(
+            Long userId,
+            Pageable pageable);
 
 }

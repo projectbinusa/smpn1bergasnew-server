@@ -1,8 +1,8 @@
 package com.smpn1.bergas.model;
 
-
-
 import com.smpn1.bergas.auditing.DateConfig;
+
+
 
 import javax.persistence.*;
 
@@ -21,6 +21,14 @@ public class Berita extends DateConfig {
 
     @Column(name = "category")
     private String categoryBerita;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
+
 
     public Berita() {
     }
@@ -65,12 +73,27 @@ public class Berita extends DateConfig {
         this.image = image;
     }
 
-
     public String getCategoryBerita() {
         return categoryBerita;
     }
 
     public void setCategoryBerita(String categoryBerita) {
         this.categoryBerita = categoryBerita;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

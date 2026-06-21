@@ -1,5 +1,8 @@
 package com.smpn1.bergas.model;
+
 import com.smpn1.bergas.auditing.DateConfig;
+
+
 
 import javax.persistence.*;
 
@@ -13,8 +16,8 @@ public class Program extends DateConfig {
     @Column(name = "nama_program")
     private String namaProgram;
 
-//    @Column(name = "judul_program")
-//    private String judulProgram;
+    // @Column(name = "judul_program")
+    // private String judulProgram;
 
     @Column(name = "tujuan")
     private String tujuan;
@@ -22,6 +25,14 @@ public class Program extends DateConfig {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
     private CategoryProgram categoryProgram;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
+
 
     public Long getId() {
         return id;
@@ -39,13 +50,13 @@ public class Program extends DateConfig {
         this.namaProgram = namaProgram;
     }
 
-//    public String getJudulProgram() {
-//        return judulProgram;
-//    }
-//
-//    public void setJudulProgram(String judulProgram) {
-//        this.judulProgram = judulProgram;
-//    }
+    // public String getJudulProgram() {
+    // return judulProgram;
+    // }
+    //
+    // public void setJudulProgram(String judulProgram) {
+    // this.judulProgram = judulProgram;
+    // }
 
     public String getTujuan() {
         return tujuan;
@@ -61,5 +72,21 @@ public class Program extends DateConfig {
 
     public void setCategoryProgram(CategoryProgram categoryProgram) {
         this.categoryProgram = categoryProgram;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+   public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

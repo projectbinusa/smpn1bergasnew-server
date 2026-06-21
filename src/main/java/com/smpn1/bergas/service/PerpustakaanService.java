@@ -10,6 +10,8 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.smpn1.bergas.model.Perpustakaan;
 import com.smpn1.bergas.repository.PerpustakaanRepository;
+import com.smpn1.bergas.util.SecurityUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,12 +38,17 @@ public class PerpustakaanService {
     @Autowired
     private PerpustakaanRepository perpustakaanRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-a0910.appspot.com/o/%s?alt=media";
 
 
     public Perpustakaan add(Perpustakaan perpustakaan , MultipartFile multipartFile) throws Exception {
         String foto = uploadFile(multipartFile);
         perpustakaan.setFoto(foto);
+        perpustakaan.setUserId(securityUtil.getCurrentUserId());
+        perpustakaan.setUserName(securityUtil.getCurrentUsername());
         return perpustakaanRepository.save(perpustakaan);
     }
     public Perpustakaan edit(Perpustakaan perpustakaan, Long id) throws Exception {
@@ -51,6 +58,8 @@ public class PerpustakaanService {
         update.setSinopsis(perpustakaan.getSinopsis());
         update.setNama_buku(perpustakaan.getNama_buku());
         update.setTahun(perpustakaan.getTahun());
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return perpustakaanRepository.save(update);
     }
     public Perpustakaan editFoto( MultipartFile multipartFile , Long id) throws Exception {
@@ -65,8 +74,15 @@ public class PerpustakaanService {
     public Page<Perpustakaan> getAll(Pageable pageable){
         return perpustakaanRepository.findAll(pageable);
     }
-    public Page<Perpustakaan> getAllTerbaru(Pageable pageable) {
-        return perpustakaanRepository.getAll(pageable);
+    public Page<Perpustakaan> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return perpustakaanRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
+    public Page<Perpustakaan> getAllTerbaru(Long userId, Pageable pageable) {
+        return perpustakaanRepository.findByUserIdOrderByCreatedDateDesc(userId, pageable);
     }
     public Map<String, Boolean> delete(Long id) {
         try {
@@ -90,7 +106,7 @@ public class PerpustakaanService {
 
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

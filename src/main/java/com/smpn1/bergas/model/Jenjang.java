@@ -2,8 +2,8 @@ package com.smpn1.bergas.model;
 
 import com.smpn1.bergas.auditing.DateConfig;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+
+
 import javax.persistence.*;
 
 @Entity
@@ -23,6 +23,13 @@ public class Jenjang extends DateConfig {
     @Lob
     @Column(name = "description")
     private String description;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
 
 
     public Long getId() {
@@ -55,5 +62,21 @@ public class Jenjang extends DateConfig {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+   public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

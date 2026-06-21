@@ -2,8 +2,11 @@ package com.smpn1.bergas.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.MateriAjar;
 import com.smpn1.bergas.repository.MateriAjarRepository;
+import com.smpn1.bergas.util.SecurityUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,11 +29,16 @@ public class MateriAjarService {
     @Autowired
     private MateriAjarRepository materiAjarRepository;
 
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+    @Autowired
+    private SecurityUtil securityUtil;
+
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
 
     public MateriAjar add(MateriAjar materiAjar, MultipartFile multipartFile) throws Exception {
         String file = uploadFIle(multipartFile);
         materiAjar.setIsi(file);
+        materiAjar.setUserId(securityUtil.getCurrentUserId());
+        materiAjar.setUserName(securityUtil.getCurrentUsername());
         return materiAjarRepository.save(materiAjar);
     }
 
@@ -41,8 +49,15 @@ public class MateriAjarService {
     public Page<MateriAjar> getAll(Pageable pageable) {
         return materiAjarRepository.findAll(pageable);
     }
-    public Page<MateriAjar> getAllTerbaru(Pageable pageable) {
-        return materiAjarRepository.getAll(pageable);
+     public Page<MateriAjar> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return materiAjarRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
+    public Page<MateriAjar> getAllTerbaru(Long userId, Pageable pageable) {
+        return materiAjarRepository.findByUserIdOrderByUpdatedDateDesc(userId, pageable);
     }
 
     public MateriAjar edit(MateriAjar materiAjar, Long id) throws Exception {
@@ -53,6 +68,8 @@ public class MateriAjarService {
             update.setJudul(materiAjar.getJudul());
             update.setPenyusun(materiAjar.getPenyusun());
             update.setTingkat(materiAjar.getTingkat());
+            update.setUserId(securityUtil.getCurrentUserId());
+            update.setUserName(securityUtil.getCurrentUsername());
 //            update.setTglUpload(materiAjar.getTglUpload());
             return materiAjarRepository.save(update);
         }
@@ -102,7 +119,7 @@ public class MateriAjarService {
 
     private String uploadFIle(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

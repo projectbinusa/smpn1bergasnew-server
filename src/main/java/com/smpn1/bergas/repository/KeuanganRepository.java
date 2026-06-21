@@ -11,7 +11,14 @@ import java.util.List;
 public interface KeuanganRepository extends JpaRepository<Keuangan , Long > {
     @Query(value = "SELECT * FROM keuangan  WHERE category = :category ", nativeQuery = true)
     Page<Keuangan> findByCategoryKeuangan_Id(String category, Pageable pageable);
+    @Query(value = "SELECT * FROM keuangan  WHERE user_id = :userId AND category = :category ", nativeQuery = true)
+    Page<Keuangan> findByUserIdAndCategoryKeuangan_Id(Long userId, String category, Pageable pageable);
 
     @Query(value = "SELECT * FROM keuangan ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Keuangan> getAll(Pageable pageable);
+
+    Page<Keuangan> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
+
 }

@@ -1,11 +1,13 @@
 package com.smpn1.bergas.controller;
 
-
-
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Kontak;
 import com.smpn1.bergas.model.Kontak;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.KontakService;
+import com.smpn1.bergas.util.DomainUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +19,10 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Sort;
+
 @RestController
 @RequestMapping("/api/kontak")
 @CrossOrigin(origins = "*")
@@ -24,8 +30,15 @@ public class KontakController {
     @Autowired
     private KontakService kontakService;
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private DomainUtil domainUtil;
+
     @PostMapping(path = "/add")
-    public ResponseEntity<CommonResponse<Kontak>> add(@RequestBody Kontak kontak) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Kontak>> add(@RequestBody Kontak kontak)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Kontak> response = new CommonResponse<>();
         try {
             Kontak kontak1 = kontakService.add(kontak);
@@ -42,11 +55,11 @@ public class KontakController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @GetMapping(path = "/all")
     public ResponseEntity<CommonResponse<Page<Kontak>>> listAllKontak(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
 
@@ -66,17 +79,62 @@ public class KontakController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<Kontak>>> listAllKontak(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<Kontak>> response = new CommonResponse<>();
+
+        try {
+            Page<Kontak> kontakPage = kontakService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(kontakPage);
+            response.setMessage("Kontak list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve kontak list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<Kontak>>> listAllKontakTerbaru(
+            HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(value = "order", defaultValue = "desc") String order) {
 
         Pageable pageable = PageRequest.of(page, size);
 
         CommonResponse<Page<Kontak>> response = new CommonResponse<>();
         try {
-            Page<Kontak> beritaPage = kontakService.getAllTerbaru(pageable);
+            Long userId = domainUtil.getCurrentUserId(request);
+            Page<Kontak> beritaPage = kontakService.getAllTerbaru(userId, pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
@@ -90,8 +148,10 @@ public class KontakController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
-    public ResponseEntity<CommonResponse<Kontak>> get(@PathVariable("id") long id) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Kontak>> get(@PathVariable("id") long id)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Kontak> response = new CommonResponse<>();
         try {
             Kontak categoryBerita = kontakService.getById(id);
@@ -108,8 +168,10 @@ public class KontakController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @PutMapping(path = "/put/{id}", produces = "application/json")
-    public ResponseEntity<CommonResponse<Kontak>> updateKontak(@PathVariable("id") Long id, @RequestBody Kontak kontak) throws SQLException, ClassNotFoundException {
+    public ResponseEntity<CommonResponse<Kontak>> updateKontak(@PathVariable("id") Long id, @RequestBody Kontak kontak)
+            throws SQLException, ClassNotFoundException {
         CommonResponse<Kontak> response = new CommonResponse<>();
         try {
             Kontak tabelDip = kontakService.edit(kontak, id);
@@ -126,6 +188,7 @@ public class KontakController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> delete(@PathVariable("id") Long id) {
         return ResponseEntity.ok(kontakService.delete(id));

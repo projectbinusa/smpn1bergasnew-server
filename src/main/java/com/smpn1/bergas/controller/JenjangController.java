@@ -1,6 +1,8 @@
 package com.smpn1.bergas.controller;
 
 
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Jenjang;
 import com.smpn1.bergas.model.Jenjang;
 import com.smpn1.bergas.response.CommonResponse;
@@ -16,12 +18,19 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Sort;
+
 @RestController
 @RequestMapping("/api/jenjang")
 @CrossOrigin(origins = "*")
 public class JenjangController {
     @Autowired
     private JenjangService jenjangService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping(path = "/add")
     public ResponseEntity<CommonResponse<Jenjang>> add(@RequestBody Jenjang jenjang) throws SQLException, ClassNotFoundException {
@@ -65,6 +74,49 @@ public class JenjangController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+     @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<Jenjang>>> listAllJenjang(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<Jenjang>> response = new CommonResponse<>();
+
+        try {
+            Page<Jenjang> jenjangPage = jenjangService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(jenjangPage);
+            response.setMessage("Jenjang list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve jenjang list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<Jenjang>>> listAllJenjangTerbaru(
             @RequestParam(defaultValue = "0") int page,

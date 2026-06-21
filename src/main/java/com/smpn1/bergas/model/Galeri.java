@@ -13,6 +13,8 @@ import javax.persistence.Table;
 
 import com.smpn1.bergas.auditing.DateConfig;
 
+
+
 @Entity
 @Table(name = "galeri")
 public class Galeri extends DateConfig {
@@ -34,6 +36,13 @@ public class Galeri extends DateConfig {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryGalery categoryGalery;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "user_name")
+    private String userName;
+
 
 
     public Long getId() {
@@ -76,5 +85,19 @@ public class Galeri extends DateConfig {
         this.categoryGalery = categoryGalery;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
 
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+   public void setUserName(String userName) {
+        this.userName = userName;
+    }
 }

@@ -1,6 +1,8 @@
 package com.smpn1.bergas.controller;
 
 import com.smpn1.bergas.DTO.LaporanBospDTO;
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.LaporanBosp;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.LaporanBospService;
@@ -19,6 +21,10 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Sort;
+
 @RestController
 @RequestMapping("/api/laporanbosp")
 @CrossOrigin(origins = "*")
@@ -26,6 +32,9 @@ public class LaporanBospController {
 
     @Autowired
     private LaporanBospService laporanService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping(path = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse<LaporanBosp>> createLaporan(
@@ -77,7 +86,47 @@ public class LaporanBospController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+ @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<LaporanBosp>>> listAllLaporan(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
 
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<LaporanBosp>> response = new CommonResponse<>();
+
+        try {
+            Page<LaporanBosp> laporanPage = laporanService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(laporanPage);
+            response.setMessage("Laporan list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve laporan list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @PutMapping(path = "/put/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse<LaporanBosp>> updateLaporan(
             @PathVariable Long id,

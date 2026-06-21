@@ -10,4 +10,13 @@ import org.springframework.data.jpa.repository.Query;
 public interface PerpustakaanRepository extends JpaRepository<Perpustakaan ,Long> {
     @Query(value = "SELECT * FROM perpustakaan ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<Perpustakaan> getAll(Pageable pageable);
+
+    Page<Perpustakaan> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
+
+
+    Page<Perpustakaan> findByUserIdOrderByCreatedDateDesc(
+            Long userId,
+            Pageable pageable);
 }

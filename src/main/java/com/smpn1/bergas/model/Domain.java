@@ -1,25 +1,25 @@
 package com.smpn1.bergas.model;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import com.smpn1.bergas.auditing.DateConfig;
 
 
 
-import javax.persistence.*;
-
 @Entity
-@Table(name = "foto_sarana")
-public class FotoSarana extends DateConfig {
+@Table(name = "domain")
+public class Domain extends DateConfig {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "sarana_id")
-    private Sarana sarana;
-
-    @Lob
-    @Column(name = "foto")
-    private String foto;
+    private String name;
 
     @Column(name = "user_id")
     private Long userId;
@@ -29,14 +29,6 @@ public class FotoSarana extends DateConfig {
 
 
 
-    public String getFoto() {
-        return foto;
-    }
-
-    public void setFoto(String foto) {
-        this.foto = foto;
-    }
-
     public Long getId() {
         return id;
     }
@@ -45,12 +37,12 @@ public class FotoSarana extends DateConfig {
         this.id = id;
     }
 
-    public Sarana getSarana() {
-        return sarana;
+    public String getName() {
+        return name;
     }
 
-    public void setSarana(Sarana sarana) {
-        this.sarana = sarana;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Long getUserId() {
@@ -68,4 +60,5 @@ public class FotoSarana extends DateConfig {
    public void setUserName(String userName) {
         this.userName = userName;
     }
+
 }

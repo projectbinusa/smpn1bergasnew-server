@@ -1,10 +1,14 @@
 package com.smpn1.bergas.controller;
 
 
+import com.smpn1.bergas.config.JwtTokenUtil;
+import com.smpn1.bergas.model.Berita;
 import com.smpn1.bergas.model.Sejarah;
 import com.smpn1.bergas.model.Sejarah;
 import com.smpn1.bergas.response.CommonResponse;
 import com.smpn1.bergas.service.SejarahService;
+import com.smpn1.bergas.util.DomainUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,12 +20,22 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.data.domain.Sort;
+
 @RestController
 @RequestMapping("/api/sejarah")
 @CrossOrigin(origins = "*")
 public class SejarahController {
     @Autowired
     private SejarahService sejarahService;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private DomainUtil domainUtil;
 
     @PostMapping(path = "/add")
     public ResponseEntity<CommonResponse<Sejarah>> add(@RequestBody Sejarah sejarah) throws SQLException, ClassNotFoundException {
@@ -65,20 +79,69 @@ public class SejarahController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+     @GetMapping(path = "/admin/all")
+    public ResponseEntity<CommonResponse<Page<Sejarah>>> listAllSejarah(
+            HttpServletRequest request,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+
+        String token = request.getHeader("Authorization").substring(7);
+        Long userId = jwtTokenUtil.getUserIdFromToken(token);
+
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
+
+        CommonResponse<Page<Sejarah>> response = new CommonResponse<>();
+
+        try {
+            Page<Sejarah> sejarahPage = sejarahService.findAllWithPaginationByUserId(
+                    userId,
+                    pageable);
+
+            response.setStatus("success");
+            response.setCode(HttpStatus.OK.value());
+            response.setData(sejarahPage);
+            response.setMessage("Sejarah list retrieved successfully.");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (Exception e) {
+            response.setStatus("error");
+            response.setCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.setData(null);
+            response.setMessage("Failed to retrieve sejarah list: " + e.getMessage());
+
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<Sejarah>>> listAllSejarahTerbaru(
+            HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortOrder) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable;
+        if (sortOrder.equals("asc")) {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
+        }
 
         CommonResponse<Page<Sejarah>> response = new CommonResponse<>();
         try {
-            Page<Sejarah> beritaPage = sejarahService.getAllTerbaru(pageable);
+            Long userId = domainUtil.getCurrentUserId(request);
+            Page<Sejarah> sejarahPage = sejarahService.getAllTerbaru(userId, pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
-            response.setData(beritaPage);
+            response.setData(sejarahPage);
             response.setMessage(" Sejarah list retrieved successfully.");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {

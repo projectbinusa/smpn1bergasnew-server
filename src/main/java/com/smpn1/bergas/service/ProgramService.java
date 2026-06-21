@@ -5,6 +5,8 @@ import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Program;
 import com.smpn1.bergas.repository.CategoryProgramRepository;
 import com.smpn1.bergas.repository.ProgramRepository;
+import com.smpn1.bergas.util.SecurityUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,12 +24,17 @@ public class ProgramService {
     @Autowired
     private CategoryProgramRepository categoryProgramRepository;
 
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public Program add(ProgramDTO programDTO){
         Program program = new Program();
         program.setCategoryProgram(categoryProgramRepository.findById(programDTO.getId_category()).orElse( null));
 //        program.setJudulProgram(programDTO.getJudul());
         program.setNamaProgram(programDTO.getNama());
         program.setTujuan(programDTO.getTujuan());
+        program.setUserId(securityUtil.getCurrentUserId());
+        program.setUserName(securityUtil.getCurrentUsername());
         return programRepository.save(program);
     }
     public Program getById(Long id){
@@ -36,14 +43,21 @@ public class ProgramService {
     public Page<Program> getAll(Pageable pageable){
         return programRepository.findAll(pageable);
     }
+    public Page<Program> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return programRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
+    }
     public Page<Program> getAllTerbaru(Pageable pageable) {
         return programRepository.getAll(pageable);
     }
     public Page<Program> getAllByKategory(Long id ,Pageable pageable) {
         return programRepository.findByIdCategory(id ,pageable);
     }
-    public Page<Program> getByJudul(String judul , Pageable pageable){
-        return programRepository.getByJudul(judul, pageable);
+    public Page<Program> getByJudul(Long userId, String judul , Pageable pageable){
+        return programRepository.getByJudul(userId, judul, pageable);
     }
     public Program edit(ProgramDTO program ,Long id){
         Program update = programRepository.findById(id).orElse(null);
@@ -51,6 +65,8 @@ public class ProgramService {
         update.setNamaProgram(program.getNama());
         update.setTujuan(program.getTujuan());
         update.setCategoryProgram(categoryProgramRepository.findById(program.getId_category()).orElse( null));
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return programRepository.save(update);
     }
     public Map<String, Boolean> delete(Long id) {

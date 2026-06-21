@@ -23,4 +23,8 @@ public interface LaporanBospRepository extends JpaRepository<LaporanBosp, Long> 
     // List<LaporanBosp> searchByNama(@Param("nama") String nama);
     @Query("SELECT p FROM LaporanBosp p WHERE p.nama LIKE CONCAT('%',:nama, '%')")
     List<LaporanBosp> searchByNama(String nama);
+
+    Page<LaporanBosp> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
 }

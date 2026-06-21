@@ -11,6 +11,8 @@ import com.google.cloud.storage.StorageOptions;
 import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.KondisiSekolah;
 import com.smpn1.bergas.repository.KondisiSekolahRepository;
+import com.smpn1.bergas.util.SecurityUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,36 +38,56 @@ import java.util.Map;
 public class KondisiSekolahService {
     @Autowired
     private KondisiSekolahRepository kondisiSekolahRepository;
-    private static final String BASE_URL = "https://s3.lynk2.co/api/s3";
+
+    @Autowired
+    private SecurityUtil securityUtil;
+    private static final String BASE_URL = "https://s3.byrtagihan.com/api/s3";
 
     private static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/upload-image-example-3790f.appspot.com/o/%s?alt=media";
 
-
-    public KondisiSekolah add(KondisiSekolah kondisiSekolah , MultipartFile multipartFile) throws Exception {
+    public KondisiSekolah add(KondisiSekolah kondisiSekolah, MultipartFile multipartFile) throws Exception {
         String foto = uploadFile(multipartFile);
         kondisiSekolah.setFoto(foto);
+        kondisiSekolah.setUserId(securityUtil.getCurrentUserId());
+        kondisiSekolah.setUserName(securityUtil.getCurrentUsername());
         return kondisiSekolahRepository.save(kondisiSekolah);
     }
+
     public KondisiSekolah edit(KondisiSekolah kondisiSekolah, Long id) throws Exception {
         KondisiSekolah update = kondisiSekolahRepository.findById(id).orElse(null);
         update.setDeskripsi(kondisiSekolah.getDeskripsi());
+        update.setUserId(securityUtil.getCurrentUserId());
+        update.setUserName(securityUtil.getCurrentUsername());
         return kondisiSekolahRepository.save(update);
     }
-    public KondisiSekolah editFoto(MultipartFile multipartFile , Long id) throws Exception {
+
+    public KondisiSekolah editFoto(MultipartFile multipartFile, Long id) throws Exception {
         KondisiSekolah update = kondisiSekolahRepository.findById(id).orElse(null);
         String foto = uploadFile(multipartFile);
         update.setFoto(foto);
         return kondisiSekolahRepository.save(update);
     }
-    public KondisiSekolah getByid(Long id){
+
+    public KondisiSekolah getByid(Long id) {
         return kondisiSekolahRepository.findById(id).orElse(null);
     }
-    public Page<KondisiSekolah> getAll(Pageable pageable){
+
+    public Page<KondisiSekolah> getAll(Pageable pageable) {
         return kondisiSekolahRepository.findAll(pageable);
     }
-    public Page<KondisiSekolah> getAllTerbaru(Pageable pageable) {
-        return kondisiSekolahRepository.getAll(pageable);
+
+    public Page<KondisiSekolah> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return kondisiSekolahRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
     }
+
+    public Page<KondisiSekolah> getAllTerbaru(Long userId, Pageable pageable) {
+        return kondisiSekolahRepository.findByUserIdOrderByCreatedDateDesc(userId, pageable);
+    }
+
     public Map<String, Boolean> delete(Long id) {
         try {
             kondisiSekolahRepository.deleteById(id);
@@ -88,7 +110,7 @@ public class KondisiSekolahService {
 
     private String uploadFile(MultipartFile multipartFile) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
-        String base_url = "https://s3.lynk2.co/api/s3/absenMasuk";
+        String base_url = "https://s3.byrtagihan.com/api/s3/absenMasuk";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
@@ -100,41 +122,46 @@ public class KondisiSekolahService {
         return fileUrl;
     }
 
-
-//    private String imageConverter(MultipartFile multipartFile) throws Exception {
-//        try {
-//            String fileName = getExtension(multipartFile.getOriginalFilename());
-//            File file = convertFile(multipartFile, fileName);
-//            var RESPONSE_URL = uploadFile(file, fileName);
-//            file.delete();
-//            return RESPONSE_URL;
-//        } catch (Exception e) {
-//            e.getStackTrace();
-//            throw new Exception("Error upload file: " + e.getMessage());
-//        }
-//    }
-//
-//    private String getExtension(String fileName) {
-//        return  fileName.split("\\.")[0];
-//    }
-//
-//    private File convertFile(MultipartFile multipartFile, String fileName) throws IOException {
-//        File file = new File(fileName);
-//        try (FileOutputStream fos = new FileOutputStream(file)) {
-//            fos.write(multipartFile.getBytes());
-//            fos.close();
-//        }
-//        System.out.println("File size: " + file.length());
-//        return file;
-//    }
-//
-//    private String uploadFile(File file, String fileName) throws IOException {
-//        BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com", fileName);
-//        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-//        InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
-//        Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
-//        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-//        storage.create(blobInfo, Files.readAllBytes(file.toPath()));
-//        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
-//    }
+    // private String imageConverter(MultipartFile multipartFile) throws Exception {
+    // try {
+    // String fileName = getExtension(multipartFile.getOriginalFilename());
+    // File file = convertFile(multipartFile, fileName);
+    // var RESPONSE_URL = uploadFile(file, fileName);
+    // file.delete();
+    // return RESPONSE_URL;
+    // } catch (Exception e) {
+    // e.getStackTrace();
+    // throw new Exception("Error upload file: " + e.getMessage());
+    // }
+    // }
+    //
+    // private String getExtension(String fileName) {
+    // return fileName.split("\\.")[0];
+    // }
+    //
+    // private File convertFile(MultipartFile multipartFile, String fileName) throws
+    // IOException {
+    // File file = new File(fileName);
+    // try (FileOutputStream fos = new FileOutputStream(file)) {
+    // fos.write(multipartFile.getBytes());
+    // fos.close();
+    // }
+    // System.out.println("File size: " + file.length());
+    // return file;
+    // }
+    //
+    // private String uploadFile(File file, String fileName) throws IOException {
+    // BlobId blobId = BlobId.of("upload-image-example-3790f.appspot.com",
+    // fileName);
+    // BlobInfo blobInfo =
+    // BlobInfo.newBuilder(blobId).setContentType("media").build();
+    // InputStream serviceAccount =
+    // getClass().getClassLoader().getResourceAsStream("bawaslu-firebase.json");
+    // Credentials credentials = GoogleCredentials.fromStream(serviceAccount);
+    // Storage storage =
+    // StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+    // storage.create(blobInfo, Files.readAllBytes(file.toPath()));
+    // return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName,
+    // StandardCharsets.UTF_8));
+    // }
 }

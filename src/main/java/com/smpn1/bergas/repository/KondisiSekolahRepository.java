@@ -9,4 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 public interface KondisiSekolahRepository extends JpaRepository<KondisiSekolah , Long> {
     @Query(value = "SELECT * FROM kondisi_sekolah ORDER BY updated_date DESC" ,nativeQuery = true)
     Page<KondisiSekolah> getAll(Pageable pageable);
+
+    Page<KondisiSekolah> findByUserIdOrderByUpdatedDateDesc(
+            Long userId,
+            Pageable pageable);
+
+
+    Page<KondisiSekolah> findByUserIdOrderByCreatedDateDesc(
+            Long userId,
+            Pageable pageable);
 }

@@ -3,6 +3,8 @@ package com.smpn1.bergas.service;
 import com.smpn1.bergas.model.Alumni;
 import com.smpn1.bergas.model.Jenjang;
 import com.smpn1.bergas.repository.JenjangRepository;
+import com.smpn1.bergas.util.SecurityUtil;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,12 +19,18 @@ import java.util.Random;
 public class JenjangService {
     @Autowired
     private JenjangRepository jenjangRepositoryRepository;
+
+    @Autowired
+    private SecurityUtil securityUtil;
+
     public Jenjang add(Jenjang jenjang) {
         if (jenjang.getNama_jenjang() != null && !jenjang.getNama_jenjang().isEmpty()) {
             String baseLink = jenjang.getNama_jenjang().trim().replaceAll("\\s+", "-").toUpperCase();
             String randomSuffix = String.format("%04d", new Random().nextInt(10000));
             jenjang.setLink(baseLink + "-" + randomSuffix);
         }
+        jenjang.setUserId(securityUtil.getCurrentUserId());
+        jenjang.setUserName(securityUtil.getCurrentUsername());
         return jenjangRepositoryRepository.save(jenjang);
     }
     public Jenjang getById(Long id){
@@ -30,6 +38,13 @@ public class JenjangService {
     }
     public Page<Jenjang> getAll(Pageable pageable){
         return jenjangRepositoryRepository.findAll(pageable);
+    }
+    public Page<Jenjang> findAllWithPaginationByUserId(
+            Long userId,
+            Pageable pageable) {
+        return jenjangRepositoryRepository.findByUserIdOrderByUpdatedDateDesc(
+                userId,
+                pageable);
     }
     public Page<Jenjang> getAllTerbaru(Pageable pageable) {
         return jenjangRepositoryRepository.getAll(pageable);
@@ -39,6 +54,8 @@ public class JenjangService {
         if (update != null) {
             update.setNama_jenjang(jenjangRepository.getNama_jenjang());
             update.setDescription(jenjangRepository.getDescription());
+            update.setUserId(securityUtil.getCurrentUserId());
+            update.setUserName(securityUtil.getCurrentUsername());
             if (jenjangRepository.getNama_jenjang() != null && !jenjangRepository.getNama_jenjang().isEmpty()) {
                 String baseLink = jenjangRepository.getNama_jenjang().trim().replaceAll("\\s+", "-").toUpperCase();
                 String randomSuffix = String.format("%04d", new Random().nextInt(10000));
