@@ -18,9 +18,9 @@ public class AppConfig implements WebMvcConfigurer {
                 .allowedHeaders("X-Requested-With", "Content-Type", "Origin", "Authorization", "Accept", "Client-Security-Token", "Accept-Encoding")
                 .allowCredentials(false)
             //    ini yang buat fe local
-             .allowedOrigins("http://localhost:3000")
+                .allowedOrigins("http://localhost:3000")
             //    ini yang buat fe deploy
-               .allowedOrigins("https://smpn1bergas.sch.id/")
+               .allowedOrigins("https://smpn1bergas.sch.id")
                 .maxAge(3600);
     }
 }
