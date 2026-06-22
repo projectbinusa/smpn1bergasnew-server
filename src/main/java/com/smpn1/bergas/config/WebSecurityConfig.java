@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+import org.springframework.http.HttpMethod;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -113,7 +113,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "/api/category_program/get/**",
         "/api/category_program/all/terbaru/**",
         "/api/program/all/terbaru/**",
-         "/api/category_galery/all",
+        "/api/category_galery/all",
         "/api/jenjang/all",
         "/api/jenjang/get/{id}",
         "/api/jenjang/get/by-link/{link}",
@@ -121,8 +121,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "/api/category_galery/all/**",
         "/api/category_galery/get/**",
         "/api/laporanbosp/all",
-        "/api/laporanbosp/get/{id}",
-        // "/api/laporanbosp/**"
+        "/api/laporanbosp/get/{id}", // "/api/laporanbosp/**"
     };
 
     private static final String[] AUTH_AUTHORIZATION = {
@@ -149,7 +148,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers(AUTH_WHITELIST).permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .antMatchers(AUTH_AUTHORIZATION).hasRole("ADMIN")
                 .antMatchers(AUTH_AUTHORIZATION).hasAnyRole("ADMIN")
                 .anyRequest()
