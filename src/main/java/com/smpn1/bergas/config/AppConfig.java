@@ -10,17 +10,24 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebMvc
 public class AppConfig implements WebMvcConfigurer {
 
+    // @Override
+    // public void addCorsMappings(CorsRegistry registry) {
+    //     registry.addMapping("/**")
+    //             .allowedOrigins("*")
+    //             .allowedMethods("GET", "POST", "PUT", "DELETE")
+    //             .allowedHeaders("X-Requested-With", "Content-Type", "Origin", "Authorization", "Accept", "Client-Security-Token", "Accept-Encoding")
+    //             .allowCredentials(false)
+    //         //    ini yang buat fe local
+    //             .allowedOrigins("http://localhost:3000")
+    //         //    ini yang buat fe deploy
+    //            .allowedOrigins("https://smpn1bergas.sch.id")
+    //             .maxAge(3600);
+    // }
     @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("*")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("X-Requested-With", "Content-Type", "Origin", "Authorization", "Accept", "Client-Security-Token", "Accept-Encoding")
-                .allowCredentials(false)
-            //    ini yang buat fe local
-                .allowedOrigins("http://localhost:3000")
-            //    ini yang buat fe deploy
-               .allowedOrigins("https://smpn1bergas.sch.id")
-                .maxAge(3600);
-    }
+public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**")
+            .allowedOriginPatterns("*")
+            .allowedMethods("*")
+            .allowedHeaders("*");
+}
 }
