@@ -1,7 +1,5 @@
 package com.smpn1.bergas.config;
 
-
-
 import com.smpn1.bergas.security.JwtUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +56,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             // authentication
             if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
 
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
+                        = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 // After setting the Authentication in the context, we specify
@@ -69,6 +67,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             } else {
                 // Handle case when token is invalid
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+                // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                // response.setContentType("application/json");
+                // response.getWriter().write("{\"message\":\"Invalid token\"}");
                 return;
             }
         }

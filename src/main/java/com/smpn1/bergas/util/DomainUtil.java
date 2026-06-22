@@ -16,7 +16,11 @@ public class DomainUtil {
 
     public Long getCurrentUserId(HttpServletRequest request) {
 
-        String domainName = request.getServerName();
+        // String domainName = request.getServerName();
+        String domainName = request.getHeader("Origin");
+        if (domainName == null) {
+            domainName = request.getHeader("Referer");
+        }
 
         System.out.println("DOMAIN AKTIF = " + domainName);
 
