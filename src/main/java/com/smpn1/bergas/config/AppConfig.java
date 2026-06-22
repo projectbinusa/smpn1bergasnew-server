@@ -7,9 +7,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 // membuat configurasi cors origin mapping controller
 @Configuration
-@EnableWebMvc
+// @EnableWebMvc
 public class AppConfig implements WebMvcConfigurer {
-
+@Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins(
+                        "http://localhost:3000",
+                        "https://smpn1bergas.sch.id"
+                )
+                .allowedMethods("*")
+                .allowedHeaders("*")
+                .maxAge(3600);
+    }
     // @Override
     // public void addCorsMappings(CorsRegistry registry) {
     //     registry.addMapping("/**")
@@ -23,11 +33,5 @@ public class AppConfig implements WebMvcConfigurer {
     //            .allowedOrigins("https://smpn1bergas.sch.id")
     //             .maxAge(3600);
     // }
-    @Override
-public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/**")
-            .allowedOriginPatterns("*")
-            .allowedMethods("*")
-            .allowedHeaders("*");
-}
+
 }

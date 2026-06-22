@@ -145,18 +145,40 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         "/bawaslu/api/carousel/**",
         "/bawaslu/api/library/**",};
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable()
-                .authorizeRequests()
-                .antMatchers(AUTH_WHITELIST).permitAll()
-                .antMatchers(AUTH_AUTHORIZATION).hasRole("ADMIN")
-                .antMatchers(AUTH_AUTHORIZATION).hasAnyRole("ADMIN")
-                .anyRequest()
-                .authenticated().and()
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    // @Override
+    // protected void configure(HttpSecurity http) throws Exception {
+    //     http.cors().and().csrf().disable()
+    //             .authorizeRequests()
+    //             .antMatchers(AUTH_WHITELIST).permitAll()
+    //             .antMatchers(AUTH_AUTHORIZATION).hasRole("ADMIN")
+    //             .antMatchers(AUTH_AUTHORIZATION).hasAnyRole("ADMIN")
+    //             .anyRequest()
+    //             .authenticated().and()
+    //             .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+    //             .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-    }
+    //     http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+    // }
+
+    @Override
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        .cors()
+        .and()
+        .csrf().disable()
+        .authorizeRequests()
+        .antMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+        .antMatchers(AUTH_WHITELIST).permitAll()
+        .antMatchers(AUTH_AUTHORIZATION).hasRole("ADMIN")
+        .anyRequest().authenticated()
+        .and()
+        .exceptionHandling()
+        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+        .and()
+        .sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+    http.addFilterBefore(jwtRequestFilter,
+            UsernamePasswordAuthenticationFilter.class);
+}
 }
