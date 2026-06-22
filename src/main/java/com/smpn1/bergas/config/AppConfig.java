@@ -17,10 +17,10 @@ public class AppConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE")
                 .allowedHeaders("X-Requested-With", "Content-Type", "Origin", "Authorization", "Accept", "Client-Security-Token", "Accept-Encoding")
                 .allowCredentials(false)
-//                ini yang buat fe local
-//              .allowedOrigins("http://localhost:3000")
-//                ini yang buat fe deploy
-//                .allowedOrigins("https://bawaslu.excellentsistem.com/")
+            //    ini yang buat fe local
+             .allowedOrigins("http://localhost:3000")
+            //    ini yang buat fe deploy
+               .allowedOrigins("https://smpn1bergas.sch.id/")
                 .maxAge(3600);
     }
 }
