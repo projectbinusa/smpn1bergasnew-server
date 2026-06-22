@@ -2,7 +2,6 @@ package com.smpn1.bergas.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 // membuat configurasi cors origin mapping controller
@@ -14,7 +13,8 @@ public class AppConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                         "http://localhost:3000",
-                        "https://smpn1bergas.sch.id"
+                        "https://smpn1bergas.sch.id",
+                        "https://api.smpn1bergas.sch.id"
                 )
                 .allowedMethods("*")
                 .allowedHeaders("*")
