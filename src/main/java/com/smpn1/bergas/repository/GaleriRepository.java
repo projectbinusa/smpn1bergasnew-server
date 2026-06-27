@@ -16,6 +16,10 @@ public interface GaleriRepository extends JpaRepository<Galeri, Long> {
     @Query(value = "SELECT * FROM galeri ORDER BY updated_date DESC", nativeQuery = true)
     Page<Galeri> getAll(Pageable pageable);
 
+    @Query(value = "SELECT * FROM galeri WHERE user_id = :userId ORDER BY updated_date DESC",
+            nativeQuery = true)
+    Page<Galeri> getAllByUserId(@Param("userId") Long userId, Pageable pageable);
+
     @Query(value = "SELECT * FROM galeri WHERE category_id = :id", nativeQuery = true)
     List<Galeri> findByIdCategory(Long id);
 

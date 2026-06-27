@@ -80,8 +80,8 @@ public class GaleriService {
                 pageable);
     }
 
-    public Page<Galeri> getAllTerbaru(Pageable pageable) {
-        return galeriRepository.getAll(pageable);
+    public Page<Galeri> getAllTerbaruByUserId(Long userId, Pageable pageable) {
+        return galeriRepository.getAllByUserId(userId, pageable);
     }
 
     public Galeri edit(Galeri galeri, Long id) throws Exception {

@@ -124,15 +124,17 @@ public class GaleriController {
     }
     @GetMapping(path = "/all/terbaru")
     public ResponseEntity<CommonResponse<Page<Galeri>>> listAllGaleriTerbaru(
+            HttpServletRequest request,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
 
         Pageable pageable = PageRequest.of(page, size);
+            Long userId = domainUtil.getCurrentUserId(request);
 
         CommonResponse<Page<Galeri>> response = new CommonResponse<>();
         try {
-            Page<Galeri> beritaPage = galeriService.getAllTerbaru(pageable);
+            Page<Galeri> beritaPage = galeriService.getAllTerbaruByUserId(userId, pageable);
             response.setStatus("success");
             response.setCode(HttpStatus.OK.value());
             response.setData(beritaPage);
